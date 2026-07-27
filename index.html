@@ -1,0 +1,1996 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>ระบบเบิกจ่ายยาและเวชภัณฑ์ | ครัวการบินกรุงเทพดอนเมือง</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Sarabun:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0B3D62; --navy-dark:#082944; --sky:#3E92CC; --sky-light:#E8F2FA;
+  --bg:#F4F8FB; --white:#FFFFFF; --green:#2E9E6D; --green-bg:#E7F5EF;
+  --amber:#E8A33D; --amber-bg:#FDF3E3; --red:#D64545; --red-bg:#FBE9E9;
+  --purple:#7C5CBF; --purple-bg:#F1ECFA;
+  --text:#12283F; --muted:#6B7C93; --border:#DCE6F0;
+  --radius:16px; --shadow:0 4px 18px rgba(11,61,98,0.08); --shadow-lg:0 14px 36px rgba(11,61,98,0.16);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{font-family:'TH Sarabun New','Sarabun',sans-serif; background:var(--bg); color:var(--text); padding-bottom:80px; -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent;}
+h1,h2,h3,h4{font-family:'Kanit','TH Sarabun New','Sarabun',sans-serif; font-weight:600; color:var(--navy);}
+.mono{font-family:'JetBrains Mono',monospace;}
+button{font-family:inherit; cursor:pointer;}
+input,select,textarea{font-family:inherit; font-size:15px;}
+
+/* ---------- HEADER ---------- */
+.topbar{background:linear-gradient(135deg,var(--navy) 0%, var(--navy-dark) 100%); color:#fff; padding:18px 20px 24px; position:relative; overflow:hidden;}
+.topbar::after{content:''; position:absolute; right:-40px; top:-50px; width:180px; height:180px; background:radial-gradient(circle, rgba(62,146,204,0.35) 0%, transparent 70%);}
+.topbar::before{content:''; position:absolute; left:-30px; bottom:-60px; width:140px; height:140px; background:radial-gradient(circle, rgba(124,92,191,0.25) 0%, transparent 70%);}
+.topbar-inner{position:relative; z-index:1; display:flex; align-items:center; gap:12px;}
+.logo-badge{width:46px; height:46px; border-radius:14px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:23px; box-shadow:inset 0 0 0 1px rgba(255,255,255,0.12);}
+.topbar h1{color:#fff; font-size:18px; line-height:1.3; letter-spacing:.01em;}
+.topbar p{color:#B9D3E8; font-size:12.5px; margin-top:2px;}
+.btn-home{background:rgba(255,255,255,0.2); border:none; border-radius:50%; width:40px; height:40px; color:#fff; font-size:18px; display:flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer; transition:background .2s;}
+.btn-home:hover{background:rgba(255,255,255,0.3);}
+
+/* ---------- CONFIG BANNER ---------- */
+.setup-banner{background:var(--amber-bg); border:1px solid #F0CE93; color:#8A5A0F; padding:12px 16px; font-size:13.5px; line-height:1.6;}
+.setup-banner code{background:#fff; padding:2px 6px; border-radius:6px; font-family:'JetBrains Mono',monospace; font-size:12px;}
+
+/* ---------- MAIN ---------- */
+main{max-width:920px; margin:0 auto; padding:16px;}
+.card{background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px; margin-bottom:14px; border:1px solid var(--border);}
+.section-title{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; gap:10px;}
+.section-title h2{font-size:16px;}
+.section-hint{font-size:12.5px; color:var(--muted); margin:-6px 0 12px; line-height:1.6;}
+
+/* ---------- SEARCH ---------- */
+.search-box{position:relative; margin-bottom:14px;}
+.search-box input{width:100%; padding:12px 14px 12px 40px; border:1.5px solid var(--border); border-radius:12px; background:var(--white); font-size:15px;}
+.search-box input:focus{outline:none; border-color:var(--sky);}
+.search-box .icon{position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--muted);}
+
+/* ---------- DROPDOWN CATEGORY ---------- */
+details.category-details summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+details.category-details summary::-webkit-details-marker { display: none; }
+details.category-details summary::after { content: ' ▼'; font-size: 11px; color: var(--muted); margin-left: auto; }
+details.category-details[open] summary::after { content: ' ▲'; }
+details.category-details { margin-bottom: 12px; }
+
+.category-label{font-size:13px; font-weight:600; color:var(--navy); margin:18px 0 8px; display:flex; align-items:center; gap:8px;}
+.category-label:first-child{margin-top:0;}
+.category-label::before{content:''; width:6px; height:6px; border-radius:50%; background:var(--sky);}
+.chip-row{display:flex; gap:8px; overflow-x:auto; margin-bottom:14px; padding-bottom:2px;}
+.chip-row::-webkit-scrollbar{display:none;}
+.chip{flex-shrink:0; padding:7px 14px; border-radius:20px; background:var(--bg); border:1.5px solid var(--border); font-size:12.5px; font-weight:600; color:var(--muted); white-space:nowrap;}
+.chip.active{background:var(--navy); color:#fff; border-color:var(--navy);}
+
+/* ---------- THUMBNAIL ---------- */
+.thumb{width:38px; height:38px; border-radius:11px; background:var(--sky-light); color:var(--sky); display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0; overflow:hidden;}
+.thumb img{width:100%; height:100%; object-fit:cover;}
+.thumb-sm{width:30px; height:30px; border-radius:9px; font-size:14px;}
+.thumb-lg{width:58px; height:58px; border-radius:14px; font-size:24px;}
+
+/* ---------- MEDICINE ITEM ---------- */
+.med-item{display:flex; align-items:center; gap:12px; padding:12px; border:1px solid var(--border); border-left:3px solid var(--sky); border-radius:13px; margin-bottom:8px; background:#fff; transition:box-shadow .15s, border-color .15s, transform .1s; cursor:pointer;}
+.med-item:hover{box-shadow:var(--shadow); border-color:var(--sky);}
+.med-item:active{transform:scale(0.99);}
+.med-item.cat-ext{border-left-color:var(--green);}
+.med-item.cat-sup{border-left-color:var(--amber);}
+.med-info{flex:1; min-width:0;}
+.med-name{font-size:14.5px; font-weight:600; color:var(--text);}
+.med-sub{font-size:12px; color:var(--muted); margin-top:3px; display:flex; flex-wrap:wrap; gap:6px; align-items:center;}
+.med-stock{text-align:right; flex-shrink:0;}
+.med-stock .qty{font-family:'JetBrains Mono',monospace; font-weight:600; font-size:15px;}
+.stock-gauge{width:56px; height:5px; border-radius:3px; background:var(--border); margin-top:5px; overflow:hidden;}
+.stock-gauge-fill{height:100%; border-radius:3px;}
+.pill{display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:600; white-space:nowrap;}
+.pill-ok{background:var(--green-bg); color:var(--green);}
+.pill-warn{background:var(--amber-bg); color:#B57415;}
+.pill-danger{background:var(--red-bg); color:var(--red);}
+.pill-muted{background:var(--bg); color:var(--muted);}
+.pill-purple{background:var(--purple-bg); color:var(--purple);}
+
+/* ---------- BOTTOM NAV ---------- */
+.bottom-nav{position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--border); display:flex; z-index:50; box-shadow:0 -6px 20px rgba(11,61,98,0.07);}
+.nav-btn{flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:9px 2px 8px; background:none; border:none; color:var(--muted); font-size:10.3px; font-weight:500;}
+.nav-btn .nav-icon{font-size:19px; line-height:1; display:flex; align-items:center; justify-content:center;}
+.nav-btn.active{color:var(--sky);}
+.nav-btn.active .nav-icon{color:var(--sky); transform:translateY(-1px);}
+
+/* ---------- BUTTONS ---------- */
+.btn{padding:12px 18px; border-radius:12px; border:none; font-weight:600; font-size:14.5px; display:inline-flex; align-items:center; justify-content:center; gap:6px; transition:transform .1s, background .15s;}
+.btn:active{transform:scale(0.98);}
+.btn-primary{background:var(--sky); color:#fff; box-shadow:0 6px 16px rgba(62,146,204,0.3);}
+.btn-primary:hover{background:#3480b2;}
+.btn-primary:disabled{background:#A9C7DC; box-shadow:none; cursor:not-allowed;}
+.btn-navy{background:var(--navy); color:#fff;}
+.btn-outline{background:#fff; border:1.5px solid var(--border); color:var(--text);}
+.btn-danger{background:var(--red-bg); color:var(--red);}
+.btn-block{width:100%;}
+.btn-sm{padding:7px 12px; font-size:13px; border-radius:9px;}
+
+/* ---------- SPOTIFY BUTTON & CARD ---------- */
+.btn-spotify { background: #1DB954; color: #fff; box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3); }
+.btn-spotify:hover { background: #1ed760; }
+.song-link-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fdfdfd;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow .15s, transform .1s;
+  cursor: pointer;
+  border-left: 4px solid #1DB954;
+}
+.song-link-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); background: #fff; }
+.song-link-card:active { transform: scale(0.98); }
+.song-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.song-info { flex: 1; min-width: 0; }
+.song-title { font-size: 14px; font-weight: 600; color: var(--navy); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.song-desc { font-size: 11.5px; color: var(--muted); line-height: 1.4; }
+.song-icon { font-size: 18px; color: #1DB954; margin-left: auto; flex-shrink: 0; }
+
+/* ---------- FORM ---------- */
+.form-group{margin-bottom:14px;}
+.form-group label{display:block; font-size:13px; font-weight:600; color:var(--navy); margin-bottom:6px;}
+.form-group input, .form-group select, .form-group textarea{width:100%; padding:11px 13px; border:1.5px solid var(--border); border-radius:11px; background:#fff;}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus{outline:none; border-color:var(--sky);}
+.form-group input[readonly]{background:var(--bg); color:var(--muted);}
+.form-group .hint{font-size:11.5px; margin-top:5px;}
+.hint-ok{color:var(--green);} .hint-warn{color:var(--red);}
+.form-row{display:flex; gap:10px;}
+.form-row .form-group{flex:1;}
+
+/* ---------- CART ---------- */
+.cart-item{display:flex; align-items:center; gap:10px; padding:10px; border:1px solid var(--border); border-radius:13px; margin-bottom:8px; background:var(--sky-light);}
+.cart-item .med-info{flex:1;}
+.cart-item .cart-qty{width:64px; padding:8px; border:1.5px solid var(--border); border-radius:9px; text-align:center;}
+.cart-item .cart-unit{font-size:12px; color:var(--muted); width:38px;}
+.cart-remove{background:none; border:none; color:var(--red); font-size:18px; padding:4px 6px;}
+.cart-empty{text-align:center; padding:20px; color:var(--muted); font-size:13px; border:1.5px dashed var(--border); border-radius:13px;}
+
+/* ---------- KNOWLEDGE CARD ---------- */
+.know-card{background:#fff; border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:10px; display:flex; gap:12px; cursor:pointer; transition:box-shadow .15s;}
+.know-card:hover{box-shadow:var(--shadow);}
+.know-icon{width:48px; height:48px; border-radius:13px; background:var(--red-bg); color:var(--red); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; overflow:hidden;}
+.know-icon img{width:100%; height:100%; object-fit:cover;}
+.know-body{flex:1; min-width:0;}
+.know-title{font-size:14.5px; font-weight:600; color:var(--navy); margin-bottom:4px;}
+.know-summary{font-size:12.5px; color:var(--muted); line-height:1.5;}
+.know-content{white-space:pre-line; font-size:14px; line-height:1.8; color:var(--text);}
+
+/* ---------- MODAL ---------- */
+.modal-overlay{position:fixed; inset:0; background:rgba(8,41,68,0.55); display:flex; align-items:flex-end; justify-content:center; z-index:100; opacity:0; pointer-events:none; transition:opacity .2s;}
+.modal-overlay.open{opacity:1; pointer-events:auto;}
+.modal{background:#fff; border-radius:22px 22px 0 0; width:100%; max-width:480px; max-height:88vh; overflow-y:auto; padding:22px 20px 26px; transform:translateY(16px); transition:transform .2s;}
+.modal-overlay.open .modal{transform:translateY(0);}
+@media(min-width:640px){.modal-overlay{align-items:center;} .modal{border-radius:20px;}}
+.modal-header{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;}
+.modal-close{background:var(--bg); border:none; width:32px; height:32px; border-radius:50%; font-size:16px; color:var(--muted);}
+
+/* ---------- TOAST ---------- */
+.toast{position:fixed; top:16px; left:50%; transform:translateX(-50%) translateY(-20px); z-index:200; background:var(--navy); color:#fff; padding:12px 20px; border-radius:12px; font-size:14px; font-weight:500; opacity:0; transition:all .25s; box-shadow:var(--shadow-lg); max-width:90%; text-align:center;}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+.toast.error{background:var(--red);} .toast.success{background:var(--green);}
+
+/* ---------- STAT CARDS ---------- */
+.stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;}
+.stat-card{background:#fff; border:1px solid var(--border); border-radius:13px; padding:14px;}
+.stat-card .stat-value{font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:600; color:var(--navy);}
+.stat-card .stat-label{font-size:12px; color:var(--muted); margin-top:2px;}
+
+/* ---------- BAR CHART ---------- */
+.bar-row{display:flex; align-items:center; gap:10px; margin-bottom:9px;}
+.bar-label{width:110px; font-size:12.5px; color:var(--text); flex-shrink:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.bar-track{flex:1; height:16px; background:var(--bg); border-radius:8px; overflow:hidden;}
+.bar-fill{height:100%; background:linear-gradient(90deg,var(--sky),var(--navy)); border-radius:8px;}
+.bar-value{width:42px; text-align:right; font-family:'JetBrains Mono',monospace; font-size:12.5px; font-weight:600; color:var(--navy); flex-shrink:0;}
+
+/* ---------- TABLE ---------- */
+table{width:100%; border-collapse:collapse; font-size:13px;}
+th{background:var(--sky-light); color:var(--navy); text-align:left; padding:9px 10px; font-weight:600; white-space:nowrap;}
+td{padding:9px 10px; border-bottom:1px solid var(--border); vertical-align:middle;}
+.table-wrap{overflow-x:auto; border-radius:13px; border:1px solid var(--border);}
+
+/* ---------- LOGIN GATE ---------- */
+.gate{display:flex; flex-direction:column; align-items:center; justify-content:center; padding:50px 20px; text-align:center;}
+.gate-icon{width:64px; height:64px; border-radius:20px; background:var(--sky-light); color:var(--sky); display:flex; align-items:center; justify-content:center; font-size:30px; margin-bottom:16px;}
+.gate h3{margin-bottom:6px;}
+.gate p{color:var(--muted); font-size:13.5px; margin-bottom:20px;}
+.gate .form-group{width:100%; max-width:280px;}
+
+/* ---------- EMPTY STATE ---------- */
+.empty{text-align:center; padding:40px 20px; color:var(--muted);}
+.empty .empty-icon{font-size:36px; margin-bottom:10px;}
+
+/* ---------- SEGMENT CONTROL ---------- */
+.segment{display:flex; background:var(--bg); border-radius:12px; padding:3px; margin-bottom:16px;}
+.segment button{flex:1; padding:9px; border:none; background:none; border-radius:10px; font-size:13px; font-weight:600; color:var(--muted);}
+.segment button.active{background:#fff; color:var(--navy); box-shadow:0 2px 6px rgba(11,61,98,0.1);}
+
+/* ---------- ADMIN MENU ---------- */
+.admin-menu{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.admin-menu button{background:#fff; border:1px solid var(--border); border-radius:15px; padding:16px 12px; text-align:left; display:flex; flex-direction:column; gap:8px;}
+.admin-menu .amicon{font-size:22px;}
+.admin-menu .amtitle{font-size:13.5px; font-weight:600; color:var(--text);}
+
+/* ---------- STEP BADGE ---------- */
+.step-badge{display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:var(--navy); color:#fff; font-size:11.5px; font-weight:700; margin-right:8px; flex-shrink:0;}
+
+/* ---------- AED INLINE BANNER ---------- */
+.aed-banner {
+  background: linear-gradient(135deg, var(--red) 0%, #b83232 100%);
+  color: #fff;
+  margin: 16px 16px 0;
+  border-radius: 14px;
+  padding: 14px 38px 14px 16px;
+  position: relative;
+  box-shadow: 0 6px 16px rgba(214,69,69,0.25);
+  display: none;
+  animation: popIn 0.4s ease forwards;
+}
+@media(min-width: 760px) {
+  .aed-banner { max-width: 888px; margin: 24px auto 0; }
+}
+.aed-banner.hidden { display: none !important; }
+.aed-banner-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: #fff;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: background 0.2s;
+}
+.aed-banner-close:active { background: rgba(255,255,255,0.4); }
+.aed-banner h4 { color: #fff; font-size: 14.5px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.aed-banner ol { margin-left: 22px; font-size: 13px; line-height: 1.5; font-family: 'TH Sarabun New','Sarabun', sans-serif; }
+.aed-banner ol li { margin-bottom: 2px; }
+
+/* ---------- FIX PRINT REPORTS & A4 STANDARDS ---------- */
+#print-area { display: none; }
+
+/* โหมดแสดงตัวอย่างหน้า A4 บนจอก่อนพิมพ์ */
+body.print-mode { background: #525659; overflow-y: auto; padding-bottom: 0; font-family: 'TH Sarabun New','Sarabun',sans-serif; }
+body.print-mode #content, body.print-mode .topbar, body.print-mode .bottom-nav, body.print-mode #aed-banner { display: none !important; }
+body.print-mode #print-area { 
+  display: block !important; 
+  background: #fff; 
+  width: 100%; 
+  max-width: 210mm; /* ขนาด A4 */
+  min-height: 297mm; 
+  margin: 20px auto; 
+  padding: 12mm 10mm; 
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+  box-sizing: border-box;
+}
+
+/* จุดที่ให้พิมพ์แก้ไขได้ จะแสดงเส้นประบนจอ */
+.editable-field {
+  display: inline-block; min-width: 160px; text-align: center;
+  border-bottom: 1px dashed #666; outline: none; cursor: text;
+  transition: background 0.2s;
+}
+.editable-field:hover { background: #fdf3e3; }
+.editable-field:focus { background: #e8f2fa; border-bottom: 1px solid var(--sky); }
+
+@media print {
+  @page { size: A4 portrait; margin: 12mm 10mm; }
+  body { background: #fff !important; margin: 0; padding: 0; font-family: 'TH Sarabun New','Sarabun',sans-serif !important; }
+  body > *:not(#print-area) { display: none !important; }
+  .aed-banner { display: none !important; } 
+  #print-area { display: block !important; width: 100%; padding: 0 !important; background: #fff; margin: 0 !important; box-shadow: none !important; }
+  #print-area * { visibility: visible; font-family: 'TH Sarabun New','Sarabun',sans-serif !important; box-sizing: border-box; }
+  
+  /* ให้ตารางคำนวณความกว้างอัตโนมัติ เพื่อไม่ให้คอลัมน์ชื่อยาโดนบีบ */
+  #print-area table { width: 100% !important; border-collapse: collapse !important; table-layout: auto !important; page-break-inside: auto; }
+  #print-area tr { page-break-inside: avoid; page-break-after: auto; }
+  #print-area td, #print-area th { 
+    font-size: 14pt !important; 
+    color: #000 !important; 
+    padding: 4px 6px;
+    vertical-align: top;
+    line-height: 1.2;
+  }
+  #print-area th { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; border-bottom: 2px solid #000; font-weight: bold; }
+  
+  /* ซ่อนเส้นประตอนพิมพ์ลงกระดาษจริง */
+  .editable-field { border-bottom: 1px solid transparent !important; }
+}
+
+@media(min-width:760px){
+  main{padding:24px;}
+  .bottom-nav{max-width:920px; left:50%; transform:translateX(-50%); border-radius:18px 18px 0 0; border:1px solid var(--border); border-bottom:none;}
+}
+
+/* ---------- WELCOME SPLASH ---------- */
+#splash-screen{
+  position:fixed; inset:0; z-index:500; overflow:hidden;
+  background:
+    radial-gradient(1000px 600px at 20% -10%, rgba(247,168,184,0.3) 0%, transparent 60%),
+    radial-gradient(900px 500px at 110% 20%, rgba(135,206,235,0.3) 0%, transparent 60%),
+    radial-gradient(1000px 700px at 50% 120%, rgba(168,228,204,0.25) 0%, transparent 60%),
+    linear-gradient(180deg, var(--navy-dark) 0%, var(--navy) 55%, #061c30 100%);
+  display:flex; flex-direction:column; opacity:1; transition:opacity .4s ease, transform .4s ease;
+}
+#splash-screen.hide{opacity:0; transform:translateY(-16px); pointer-events:none;}
+.splash-nav{
+  position:absolute; top:16px; left:16px; right:16px; z-index:5;
+  display:flex; align-items:center; justify-content:space-between;
+  background:rgba(255,255,255,0.10); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,0.16); border-radius:999px; padding:9px 9px 9px 18px;
+  animation:fadeSlideUp .5s ease .05s both;
+}
+.splash-nav-logo{display:flex; align-items:center; gap:8px; color:#fff; font-family:'Kanit',sans-serif; font-weight:600; font-size:13.5px; letter-spacing:.01em;}
+.splash-nav-logo .dot{width:8px; height:8px; border-radius:50%; background:#A8E4CC; box-shadow:0 0 8px #A8E4CC;}
+.splash-hero{position:relative; z-index:3; text-align:center; padding:78px 22px 0; flex-shrink:0;}
+.splash-hero-title{
+  font-family:'Kanit',sans-serif; font-weight:600; color:#fff; font-size:34px; line-height:1.15;
+  letter-spacing:-0.02em; animation:fadeSlideUp .55s ease .12s both;
+}
+.splash-hero-title .accent{color:#A8E4CC;}
+.splash-hero-sub{
+  color:#C7DDEE; font-size:13.5px; line-height:1.6; max-width:320px; margin:12px auto 0;
+  animation:fadeSlideUp .55s ease .18s both;
+}
+.mascot-wrap{
+  position:relative; z-index:2; flex:1; min-height:0; width:100%;
+  display:flex; align-items:flex-end; justify-content:center; margin-top:8px;
+  animation:fadeSlideUp .6s ease .22s both;
+}
+.mascot-wrap img{max-width:300px; width:80%; height:auto; max-height:100%; object-fit:contain; filter:drop-shadow(0 20px 34px rgba(0,0,0,0.3)); animation:floatUp 4.2s ease-in-out .8s infinite;}
+.splash-panel{
+  position:relative; z-index:4; margin:0 12px calc(12px + env(safe-area-inset-bottom));
+  background:rgba(8,41,68,0.55); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,0.14); border-radius:22px; padding:18px 20px;
+  animation:fadeSlideUp .5s ease .3s both;
+}
+.splash-kicker{display:flex; align-items:center; gap:7px; color:#A8E4CC; font-size:13px; font-weight:700; font-family:'Kanit',sans-serif; margin-bottom:8px;}
+.splash-quote{color:#EAF3FA; font-size:13px; line-height:1.7; margin-bottom:14px;}
+.splash-quote .signoff{display:block; margin-top:4px; color:#A8E4CC; font-weight:600; font-family:'Kanit',sans-serif; font-size:12px;}
+.splash-cta-row{display:flex; align-items:center; gap:16px; flex-wrap:wrap;}
+.btn-pill{border-radius:999px !important; padding:13px 26px !important; box-shadow:0 10px 26px rgba(62,146,204,0.45) !important;}
+.load-wrap{margin-bottom:14px;}
+.load-label{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; font-size:12px; color:#B9D3E8; font-weight:500;}
+.load-label .load-pct{font-family:'JetBrains Mono',monospace; font-weight:600; color:#A8E4CC;}
+.load-bar-track{width:100%; height:8px; border-radius:20px; background:rgba(255,255,255,0.14); overflow:hidden; position:relative; box-shadow:inset 0 1px 3px rgba(0,0,0,0.25);}
+.load-bar-fill{height:100%; width:4%; border-radius:20px; background:linear-gradient(90deg,#87CEEB,#A8E4CC); transition:width .5s cubic-bezier(.4,0,.2,1); position:relative; overflow:hidden;}
+.load-bar-fill::after{
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.55) 50%, transparent 70%);
+  background-size:200% 100%; animation:shimmer 1.4s linear infinite;
+}
+@keyframes shimmer{0%{background-position:200% 0;} 100%{background-position:-200% 0;}}
+#top-loader{position:fixed; top:0; left:0; right:0; height:3px; z-index:600; pointer-events:none;}
+#top-loader-bar{height:100%; width:0%; background:linear-gradient(90deg,var(--sky),#A8E4CC); box-shadow:0 0 10px rgba(62,146,204,0.7); opacity:0; transition:width .35s ease, opacity .3s ease;}
+
+@keyframes floatUp{0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);}}
+@keyframes fadeSlideUp{from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);}}
+@keyframes popIn{0%{opacity:0; transform:scale(.85);} 70%{transform:scale(1.03);} 100%{opacity:1; transform:scale(1);}}
+@keyframes drift{0%{transform:translate(0,0) rotate(0deg); opacity:.55;} 50%{opacity:.9;} 100%{transform:translate(var(--dx,14px),-26px) rotate(12deg); opacity:.2;}}
+
+.splash-particles{position:absolute; inset:0; overflow:hidden; z-index:1; pointer-events:none;}
+.splash-particles span{
+  position:absolute; font-size:20px; opacity:.35; animation:drift 6s ease-in-out infinite;
+}
+
+@media(min-height:740px){
+  .splash-hero{padding-top:96px;}
+  .mascot-wrap img{max-width:380px;}
+}
+@media(min-width:520px){
+  .splash-panel{max-width:420px; margin-left:auto; margin-right:auto;}
+}
+</style>
+</head>
+<body>
+
+<div id="top-loader"><div id="top-loader-bar"></div></div>
+
+<div id="splash-screen">
+  <div class="splash-particles">
+    <span style="left:12%; top:16%; animation-delay:0s; --dx:18px;">💊</span>
+    <span style="left:85%; top:12%; animation-delay:1.1s; --dx:-16px;">💧</span>
+    <span style="left:18%; top:56%; animation-delay:2.2s; --dx:12px;">🩹</span>
+    <span style="left:90%; top:48%; animation-delay:0.6s; --dx:-14px;">✨</span>
+    <span style="left:50%; top:6%; animation-delay:1.7s; --dx:10px;">💙</span>
+  </div>
+
+  <nav class="splash-nav">
+    <div class="splash-nav-logo"><span class="dot"></span> ระบบเบิกยา · ครัวการบินดอนเมือง</div>
+  </nav>
+
+  <div class="splash-hero">
+    <h1 class="splash-hero-title">Safety เริ่มต้นที่<br><span class="accent">พวกเรา</span></h1>
+    <p class="splash-hero-sub">ระบบเบิกจ่ายยาและเวชภัณฑ์ เพื่อความปลอดภัยและอาชีวอนามัยของทุกคน</p>
+  </div>
+
+  <div class="mascot-wrap">
+    <img src="https://drive.google.com/thumbnail?id=1iVVa9gzjnA_uX87ZNCMZcgNJueHo09VT&sz=w800" alt="แก๊งอาชีวอนามัย Pharmi Doc Suppli">
+  </div>
+
+  <div class="splash-panel">
+    <div class="splash-kicker">🩺 เจ้าหน้าที่ฝ่ายปฎิบัติการ ตัวแทนทีม Safety</div>
+    <div class="splash-quote">
+      "ให้ผมดูแลการเบิกยาสามัญประจำสำนักงานของพี่ๆ นะครับ! เพื่อความปลอดภัยอย่าลืมลงบันทักนะครับ"
+      <span class="signoff">จากป๊อปปี้ Duty DMK</span>
+    </div>
+    <div class="load-wrap" id="load-wrap">
+      <div class="load-label">
+        <span id="load-text">กำลังเตรียมระบบ...</span>
+        <span class="load-pct" id="load-pct">0%</span>
+      </div>
+      <div class="load-bar-track"><div class="load-bar-fill" id="load-bar-fill"></div></div>
+    </div>
+    <div class="splash-cta-row">
+      <button class="btn btn-primary btn-pill" id="splash-enter-btn" onclick="dismissSplash()" disabled style="width:100%;">เข้าสู่ระบบเบิกยา 💊</button>
+    </div>
+  </div>
+</div>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="logo-badge">🩺</div>
+    <div style="flex:1; min-width:0;">
+      <h1 style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">ระบบเบิกจ่ายยาและเวชภัณฑ์</h1>
+      <p style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">ดูแลโดยแก๊ง Pharmi, Doc & Suppli</p>
+    </div>
+    <button class="btn-home" onclick="showSplash()" title="กลับหน้าแรก">🏠</button>
+  </div>
+</div>
+
+<div id="aed-banner" class="aed-banner">
+  <button class="aed-banner-close" onclick="closeAedBanner()">✕</button>
+  <h4><span style="font-size:16px;">🚨</span> ข้อมูลสำคัญ: เครื่อง AED ที่ใกล้ที่สุด</h4>
+  <ol>
+    <li>ป้อมตรวจค้นตัวและรถ ช่องทางที่ 4</li>
+    <li>SRT รถไฟฟ้าสายสีแดง สถานีการเคหะ (อยู่กลางสถานี)</li>
+    <li>อาคารศุลกากรดอนเมือง ชั้นที่ 1 ใกล้ห้องนายตรวจ</li>
+  </ol>
+</div>
+
+<div id="setup-banner-slot"></div>
+<main id="content"></main>
+<div id="print-area"></div>
+
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="nav-btn" data-view="request"><span class="nav-icon">📋</span>เบิกยา</button>
+  <button class="nav-btn" data-view="knowledge"><span class="nav-icon">🫀</span>ความรู้</button>
+  <button class="nav-btn" data-view="import"><span class="nav-icon">📥</span>นำเข้า</button>
+  <button class="nav-btn" data-view="reports"><span class="nav-icon">🖨️</span>รายงาน</button>
+  <button class="nav-btn" data-view="admin"><span class="nav-icon">🛡️</span>แอดมิน</button>
+</nav>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal-body"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   CONFIG
+   ============================================================ */
+const CONFIG = {
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwcLAmXZ5BSMPHz7FQ4zkXOxq0VyTPbYFOdW0Q0k043oO5UbGKa3rsyqnluTq8Mb48t/exec",
+  THANK_YOU_MESSAGE: ""
+};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  view: 'request',
+  medicines: [],
+  employees: [],
+  caretakers: [],
+  knowledge: [],
+  knowledgeFilter: 'all',
+  cart: [],
+  importCart: [],
+  matchedEmployee: null,
+  isAdmin: false,
+  adminPassword: '',
+  importPasscode: '',
+  importUnlocked: false,
+  dashboard: null,
+  historyType: 'request',
+  lastAction: null,
+  pendingRequest: null
+};
+
+/* ============================================================
+   API HELPER
+   ============================================================ */
+async function api(action, data = {}) {
+  if (!CONFIG.APPS_SCRIPT_URL) throw new Error('ยังไม่ได้ตั้งค่า Apps Script URL');
+  startTopLoader();
+  try {
+    const res = await fetch(CONFIG.APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action, ...data })
+    });
+    return await res.json();
+  } finally {
+    finishTopLoader();
+  }
+}
+
+let _activeRequests = 0;
+function startTopLoader() {
+  _activeRequests++;
+  const bar = document.getElementById('top-loader-bar');
+  if (!bar) return;
+  bar.style.transition = 'width .4s ease, opacity .3s ease';
+  bar.style.opacity = '1';
+  bar.style.width = '65%';
+}
+function finishTopLoader() {
+  _activeRequests = Math.max(0, _activeRequests - 1);
+  if (_activeRequests > 0) return;
+  const bar = document.getElementById('top-loader-bar');
+  if (!bar) return;
+  bar.style.width = '100%';
+  setTimeout(() => {
+    bar.style.opacity = '0';
+    setTimeout(() => { bar.style.transition = 'none'; bar.style.width = '0%'; }, 300);
+  }, 200);
+}
+
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => { t.className = 'toast ' + type; }, 2800);
+}
+function openModal(html) {
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+document.getElementById('modal-overlay').addEventListener('click', (e) => { if (e.target.id === 'modal-overlay') closeModal(); });
+
+function esc(str) { return String(str ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function todayISO() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+
+/* ============================================================
+   DATE FORMATTING
+   ============================================================ */
+function parseThaiDate(str) {
+  if (!str) return null;
+  const s = String(str).trim();
+  if (s.includes('T') || s.includes('-')) {
+    const d = new Date(s);
+    if (!isNaN(d.getTime())) return d;
+  }
+  const parts = s.split('/');
+  if (parts.length === 3) {
+    const [d, m, y] = parts.map(Number);
+    if (d && m && y) {
+      const year = y > 2400 ? y - 543 : y; 
+      return new Date(year, m - 1, d);
+    }
+  }
+  return null;
+}
+
+function formatThaiDateCE(dateObj) {
+  if (!dateObj || isNaN(dateObj.getTime())) return '-';
+  const months = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  return `${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+}
+
+function formatDisplayDate(str) {
+  const d = parseThaiDate(str);
+  return d ? formatThaiDateCE(d) : (str || '-');
+}
+
+function formatDate(iso) {
+  if (!iso) return '-';
+  if (String(iso).includes('/') && String(iso).length <= 10) {
+     const p = parseThaiDate(iso);
+     return p ? formatThaiDateCE(p) : iso;
+  }
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) {
+     const parsed = parseThaiDate(iso);
+     return parsed ? formatThaiDateCE(parsed) : iso;
+  }
+  const dateStr = formatThaiDateCE(d);
+  const hh = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  if (iso.includes('T') || (d.getHours() !== 0 || d.getMinutes() !== 0)) {
+      return `${dateStr} เวลา ${hh}:${min} น.`;
+  }
+  return dateStr;
+}
+
+/* ============================================================
+   WELCOME SPLASH & AED BANNER
+   ============================================================ */
+function dismissSplash() {
+  const splash = document.getElementById('splash-screen');
+  splash.classList.add('hide');
+  document.getElementById('bottom-nav').style.display = 'flex';
+  document.body.style.overflow = '';
+  
+  const aedBanner = document.getElementById('aed-banner');
+  if(aedBanner) {
+    aedBanner.style.display = 'block';
+    aedBanner.classList.remove('hidden');
+  }
+  setTimeout(() => { splash.style.display = 'none'; }, 400);
+}
+
+function showSplash() {
+  const splash = document.getElementById('splash-screen');
+  splash.style.display = 'flex';
+  void splash.offsetWidth; 
+  setTimeout(() => { splash.classList.remove('hide'); }, 10);
+  document.getElementById('bottom-nav').style.display = 'none';
+  document.body.style.overflow = 'hidden';
+
+  const aedBanner = document.getElementById('aed-banner');
+  if(aedBanner) {
+    aedBanner.style.display = 'none';
+    aedBanner.classList.add('hidden');
+  }
+}
+
+function closeAedBanner() {
+  const banner = document.getElementById('aed-banner');
+  if(banner) {
+    banner.classList.add('hidden');
+    setTimeout(() => { banner.style.display = 'none'; }, 300);
+  }
+}
+
+/* ============================================================
+   SETUP BANNER
+   ============================================================ */
+function renderSetupBanner() {
+  const slot = document.getElementById('setup-banner-slot');
+  if (CONFIG.APPS_SCRIPT_URL) { slot.innerHTML = ''; return; }
+  slot.innerHTML = `<div class="setup-banner">⚠️ ยังไม่ได้เชื่อมต่อ Google ชีต</div>`;
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+document.getElementById('bottom-nav').addEventListener('click', (e) => {
+  const btn = e.target.closest('.nav-btn');
+  if (!btn) return;
+  navigate(btn.dataset.view);
+});
+function navigate(view) {
+  state.view = view;
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+  render();
+  window.scrollTo(0, 0);
+}
+
+/* ============================================================
+   DATA LOADING
+   ============================================================ */
+async function loadMedicines() {
+  try {
+    const res = await api('getMedicines');
+    if (res.ok) state.medicines = res.medicines;
+    else showToast(res.error || 'โหลดข้อมูลไม่สำเร็จ', 'error');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+async function loadStaffData() {
+  try {
+    const res = await api('getStaffData');
+    if (res.ok) { state.employees = res.employees; state.caretakers = res.caretakers; }
+  } catch (err) { /* silent */ }
+}
+async function loadKnowledge() {
+  try {
+    const res = await api('getKnowledge');
+    if (res.ok) state.knowledge = res.articles;
+  } catch (err) { /* silent */ }
+}
+
+function stockStatus(item) {
+  if (item.stock <= 0) return { pill: 'pill-danger', label: 'หมด', color: 'var(--red)' };
+  if (item.stock <= item.reorderPoint) return { pill: 'pill-warn', label: 'ใกล้หมด', color: 'var(--amber)' };
+  return { pill: 'pill-ok', label: 'พร้อมใช้', color: 'var(--green)' };
+}
+function categoryEmoji(cat) {
+  if (cat === 'ยาใช้ภายนอก') return '🧴';
+  if (cat === 'เวชภัณฑ์') return '🩹';
+  return '💊';
+}
+function categoryClass(cat) {
+  if (cat === 'ยาใช้ภายนอก') return 'cat-ext';
+  if (cat === 'เวชภัณฑ์') return 'cat-sup';
+  return '';
+}
+function thumbHtml(item, size = '') {
+  const cls = 'thumb' + (size ? ' thumb-' + size : '');
+  if (item.image) return `<div class="${cls}"><img src="${esc(item.image)}" alt="${esc(item.name)}" onerror="this.parentElement.innerHTML='${categoryEmoji(item.category)}'"></div>`;
+  return `<div class="${cls}">${categoryEmoji(item.category)}</div>`;
+}
+
+/* ============================================================
+   VIEW: REQUEST (เบิกยา)
+   ============================================================ */
+function renderRequestView() {
+  document.getElementById('content').innerHTML = `
+    <div class="card">
+      <div class="section-title"><h2><span class="step-badge">1</span>ข้อมูลผู้เบิก</h2></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>วันที่เบิกยา</label>
+          <input type="date" id="rf-date" value="${todayISO()}">
+        </div>
+        <div class="form-group">
+          <label>รหัสพนักงาน</label>
+          <input type="text" id="rf-empid" placeholder="เช่น EMP001" oninput="lookupEmployee()">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>ชื่อ-สกุล</label>
+        <input type="text" id="rf-empname" readonly placeholder="จะแสดงอัตโนมัติเมื่อกรอกรหัสพนักงาน">
+        <div class="hint" id="emp-hint"></div>
+      </div>
+      <div class="form-group">
+        <label>อาการที่เกิดขึ้น</label>
+        <textarea id="rf-symptom" rows="2" placeholder="เช่น ปวดหัว มีไข้ มีแผล"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title"><h2><span class="step-badge">2</span>รายการยาและเวชภัณฑ์ที่เบิก</h2></div>
+      <div class="section-hint">ค้นหาแล้วแตะรายการเพื่อเพิ่มลงตะกร้า — เลือกได้หลายรายการในใบเดียว เช่น เป็นแผลก็เพิ่มผ้าพันแผล แอลกอฮอล์ น้ำเกลือ เบตาดีนได้พร้อมกัน</div>
+      <div class="search-box">
+        <span class="icon">🔍</span>
+        <input type="text" id="med-search" placeholder="ค้นหายาหรือเวชภัณฑ์...">
+      </div>
+      <div id="med-list"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title"><h2><span class="step-badge">3</span>ตะกร้าที่จะเบิก</h2></div>
+      <div id="cart-list"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title"><h2><span class="step-badge">4</span>ผู้ดูแลและหมายเหตุ</h2></div>
+      <div class="form-group">
+        <label>ผู้ดูแล</label>
+        <select id="rf-caretaker">
+          <option value="">-- เลือกผู้ดูแล --</option>
+          ${state.caretakers.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>หมายเหตุ</label>
+        <textarea id="rf-note" rows="2"></textarea>
+      </div>
+      <button class="btn btn-primary btn-block" id="rf-submit" onclick="reviewRequest()">ตรวจสอบข้อบ่งใช้ & ยืนยันเบิก</button>
+    </div>
+  `;
+  renderMedicineBrowseList();
+  renderCartList();
+
+  document.getElementById('med-search').addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    document.querySelectorAll('#med-list .med-item').forEach(el => {
+      const name = el.querySelector('.med-name').textContent.toLowerCase();
+      el.style.display = name.includes(q) ? '' : 'none';
+    });
+    
+    document.querySelectorAll('details.category-details').forEach(details => {
+      const items = details.querySelectorAll('.med-item');
+      let hasVisible = false;
+      items.forEach(item => {
+        if (item.style.display !== 'none') hasVisible = true;
+      });
+      details.style.display = hasVisible ? '' : 'none';
+    });
+  });
+}
+
+function renderMedicineBrowseList() {
+  const grouped = {};
+  state.medicines.forEach(m => { (grouped[m.category] = grouped[m.category] || []).push(m); });
+  let html = '';
+  if (state.medicines.length === 0) {
+    html = `<div class="empty"><div class="empty-icon">📭</div>ยังไม่มีข้อมูลยา หรือกำลังโหลด...</div>`;
+  } else {
+    Object.keys(grouped).forEach(cat => {
+      html += `
+        <details class="category-details" open>
+          <summary class="category-label">${esc(cat)}</summary>
+          <div class="category-content">
+      `;
+      grouped[cat].forEach(item => {
+        const st = stockStatus(item);
+        const pct = item.reorderPoint > 0 ? Math.min(100, Math.round((item.stock / (item.reorderPoint * 3)) * 100)) : 100;
+        
+        const d = parseThaiDate(item.expiry);
+        let badgeHtml = `<span class="pill pill-muted">ไม่ระบุวันหมดอายุ</span>`;
+        if(d) {
+           const days = Math.ceil((d.getTime() - new Date().getTime()) / 86400000);
+           const dateStr = formatThaiDateCE(d);
+           if (days < 0) badgeHtml = `<span class="pill pill-danger">หมดอายุแล้ว (${dateStr})</span>`;
+           else if (days <= 60) badgeHtml = `<span class="pill pill-warn">เหลือ ${days} วัน (${dateStr})</span>`;
+           else badgeHtml = `<span class="pill pill-ok">เหลือ ${days} วัน (${dateStr})</span>`;
+        }
+
+        html += `
+          <div class="med-item ${categoryClass(item.category)}" onclick="addToCart(${item.rowIndex})">
+            ${thumbHtml(item)}
+            <div class="med-info">
+              <div class="med-name">${esc(item.name)}</div>
+              <div class="med-sub">${esc(item.volume)}${item.volume ? ' ' : ''}${item.unit ? '· หน่วย ' + esc(item.unit) : ''} ${badgeHtml}</div>
+            </div>
+            <div class="med-stock">
+              <div><span class="qty">${item.stock}</span> <span style="font-size:11px;color:var(--muted)">${esc(item.unit)}</span></div>
+              <div class="stock-gauge"><div class="stock-gauge-fill" style="width:${pct}%; background:${st.color}"></div></div>
+            </div>
+          </div>`;
+      });
+      html += `</div></details>`;
+    });
+  }
+  document.getElementById('med-list').innerHTML = html;
+}
+
+function lookupEmployee() {
+  const id = document.getElementById('rf-empid').value.trim();
+  const nameField = document.getElementById('rf-empname');
+  const hint = document.getElementById('emp-hint');
+  if (!id) { nameField.value = ''; hint.innerHTML = ''; state.matchedEmployee = null; return; }
+  const found = state.employees.find(e => e.id.toLowerCase() === id.toLowerCase());
+  if (found) {
+    nameField.value = found.name;
+    hint.innerHTML = `<span class="hint-ok">✓ พบข้อมูลพนักงาน${found.department ? ' · ' + esc(found.department) : ''}</span>`;
+    state.matchedEmployee = found;
+  } else {
+    nameField.value = '';
+    hint.innerHTML = `<span class="hint-warn">✕ ไม่พบรหัสพนักงานนี้ กรุณาตรวจสอบ</span>`;
+    state.matchedEmployee = null;
+  }
+}
+
+function addToCart(rowIndex) {
+  const item = state.medicines.find(m => m.rowIndex === rowIndex);
+  if (!item) return;
+  if (item.stock <= 0) return showToast('รายการนี้หมดสต๊อกแล้ว', 'error');
+  const existing = state.cart.find(c => c.rowIndex === rowIndex);
+  if (existing) {
+    if (existing.qty < item.stock) existing.qty += 1;
+    else return showToast('จำนวนคงเหลือไม่พอเพิ่มอีก', 'error');
+  } else {
+    state.cart.push({ rowIndex, name: item.name, unit: item.unit, image: item.image, category: item.category, stock: item.stock, qty: 1, indication: item.indication });
+  }
+  renderCartList();
+  showToast('เพิ่ม "' + item.name + '" ลงตะกร้าแล้ว', 'success');
+}
+function removeFromCart(rowIndex) {
+  state.cart = state.cart.filter(c => c.rowIndex !== rowIndex);
+  renderCartList();
+}
+function updateCartQty(rowIndex, value) {
+  const c = state.cart.find(x => x.rowIndex === rowIndex);
+  if (!c) return;
+  let qty = Number(value);
+  if (!qty || qty < 1) qty = 1;
+  if (qty > c.stock) { qty = c.stock; showToast('จำนวนคงเหลือไม่พอ', 'error'); }
+  c.qty = qty;
+  renderCartList();
+}
+function renderCartList() {
+  const el = document.getElementById('cart-list');
+  if (!el) return;
+  if (state.cart.length === 0) {
+    el.innerHTML = `<div class="cart-empty">ยังไม่มีรายการในตะกร้า — เลือกจากรายการด้านบน</div>`;
+    return;
+  }
+  el.innerHTML = state.cart.map(c => `
+    <div class="cart-item">
+      ${thumbHtml(c, 'sm')}
+      <div class="med-info">
+        <div class="med-name">${esc(c.name)}</div>
+        <div class="med-sub">คงเหลือ ${c.stock} ${esc(c.unit)}</div>
+      </div>
+      <input type="number" class="cart-qty" min="1" max="${c.stock}" value="${c.qty}" onchange="updateCartQty(${c.rowIndex}, this.value)">
+      <div class="cart-unit">${esc(c.unit)}</div>
+      <button class="cart-remove" onclick="removeFromCart(${c.rowIndex})">✕</button>
+    </div>`).join('');
+}
+
+/* ---------- ขั้นตอนตรวจสอบข้อบ่งใช้ก่อนยืนยันเบิก ---------- */
+function reviewRequest() {
+  const date = document.getElementById('rf-date').value;
+  const employeeId = document.getElementById('rf-empid').value.trim();
+  const employeeName = document.getElementById('rf-empname').value.trim();
+  const symptom = document.getElementById('rf-symptom').value.trim();
+  const caretaker = document.getElementById('rf-caretaker').value;
+  const note = document.getElementById('rf-note').value.trim();
+
+  if (!date) return showToast('กรุณาเลือกวันที่เบิก', 'error');
+  if (!employeeId) return showToast('กรุณากรอกรหัสพนักงาน', 'error');
+  if (!employeeName) return showToast('ไม่พบชื่อพนักงาน กรุณาตรวจสอบรหัสพนักงาน', 'error');
+  if (!caretaker) return showToast('กรุณาเลือกผู้ดูแล', 'error');
+  if (state.cart.length === 0) return showToast('กรุณาเลือกรายการยาอย่างน้อย 1 รายการ', 'error');
+
+  state.pendingRequest = { date, employeeId, employeeName, symptom, caretaker, note };
+
+  const itemsHtml = state.cart.map(c => `
+    <div style="border-bottom:1px solid var(--border); padding:10px 0;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+          ${thumbHtml(c, 'sm')}
+          <span style="font-weight:600; font-size:13.5px; color:var(--navy);">${esc(c.name)}</span>
+        </div>
+        <span style="font-family:'JetBrains Mono',monospace; font-size:13px; flex-shrink:0;">${c.qty} ${esc(c.unit)}</span>
+      </div>
+      <div style="font-size:12.5px; color:var(--text); margin-top:6px; background:var(--sky-light); padding:8px 10px; border-radius:9px; line-height:1.6; white-space:pre-line;"><b>💊 ข้อบ่งใช้/วิธีใช้:</b>\n${c.indication || 'ไม่มีข้อมูลระบุเพิ่มเติม โปรดสอบถามผู้ดูแลก่อนใช้'}</div>
+    </div>`).join('');
+
+  openModal(`
+    <div class="modal-header"><h3 style="font-size:16px;">⚠️ ตรวจสอบข้อบ่งใช้ก่อนยืนยัน</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div style="background: var(--red-bg); color: var(--red); padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+      <span style="font-size: 18px;">⚠️</span> หากรับประทานยาหรือปฐมพยาบาลแล้ว อาการไม่ดีขึ้น โปรดไปพบแพทย์
+    </div>
+    <div style="max-height:260px; overflow-y:auto; margin-bottom:16px;">${itemsHtml}</div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-outline btn-block" onclick="closeModal()">กลับไปแก้ไข</button>
+      <button class="btn btn-primary btn-block" id="confirm-submit-btn" onclick="submitFullRequest()">ยืนยันการเบิก</button>
+    </div>
+  `);
+}
+
+async function submitFullRequest() {
+  const p = state.pendingRequest;
+  if (!p) return;
+  const btn = document.getElementById('confirm-submit-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'กำลังบันทึก...'; }
+  try {
+    const items = state.cart.map(c => ({ itemName: c.name, qty: c.qty }));
+    const res = await api('submitRequest', { ...p, items });
+    if (res.ok) {
+      closeModal();
+      state.lastAction = { type: 'request', ...p, items: state.cart.map(c => ({...c})), timestamp: res.timestamp, requestId: res.requestId };
+      state.cart = [];
+      state.pendingRequest = null;
+      await loadMedicines();
+      navigate('request');
+      showThankYouModal();
+    } else {
+      showToast(res.error || 'เกิดข้อผิดพลาด', 'error');
+      if (btn) { btn.disabled = false; btn.textContent = 'ยืนยันการเบิก'; }
+    }
+  } catch (err) {
+    showToast(err.message, 'error');
+    if (btn) { btn.disabled = false; btn.textContent = 'ยืนยันการเบิก'; }
+  }
+}
+
+function showThankYouModal() {
+  const msg = CONFIG.THANK_YOU_MESSAGE && CONFIG.THANK_YOU_MESSAGE.trim()
+    ? esc(CONFIG.THANK_YOU_MESSAGE)
+    : 'บันทึกการเบิกยาเรียบร้อยแล้ว';
+  setTimeout(() => {
+    openModal(`
+      <div class="modal-header"><h3>✅ สำเร็จ</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+      <p style="font-size:14.5px;line-height:1.7;margin-bottom:18px;">${msg}</p>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-outline btn-block" onclick="closeModal()">ปิด</button>
+        <button class="btn btn-primary btn-block" onclick="printSlip()">🖨️ พิมพ์ใบเบิก</button>
+      </div>
+    `);
+  }, 200);
+}
+
+/* ============================================================
+   VIEW: KNOWLEDGE
+   ============================================================ */
+function knowledgeCategories() {
+  const cats = Array.from(new Set(state.knowledge.map(a => a.category).filter(Boolean)));
+  return cats;
+}
+function knowledgeIcon(cat) {
+  if (!cat) return '📖';
+  if (cat.includes('ช่วยชีวิต')) return '🫀';
+  if (cat.includes('ปฐมพยาบาล')) return '🩹';
+  return '📖';
+}
+function renderKnowledgeView() {
+  const cats = knowledgeCategories();
+  document.getElementById('content').innerHTML = `
+    <div class="card">
+      <div class="section-title"><h2>🫀 คลังความรู้ความปลอดภัยและปฐมพยาบาล</h2></div>
+      <div class="section-hint">ความรู้เกี่ยวกับการช่วยชีวิตขั้นพื้นฐาน (CPR), การใช้เครื่อง AED และการปฐมพยาบาลเบื้องต้น — ดูแลและอัปเดตโดยเจ้าหน้าที่คณะกรรมการความปลอดภัยและอาชีวอนามัย ครัวการบิน กรุงเทพ ดอนเมือง</div>
+      <div class="search-box">
+        <span class="icon">🔍</span>
+        <input type="text" id="know-search" placeholder="ค้นหาบทความ...">
+      </div>
+      <div class="chip-row" id="know-chips">
+        <button class="chip ${state.knowledgeFilter==='all'?'active':''}" data-cat="all">ทั้งหมด</button>
+        ${cats.map(c => `<button class="chip ${state.knowledgeFilter===c?'active':''}" data-cat="${esc(c)}">${esc(c)}</button>`).join('')}
+      </div>
+      <div id="know-list"></div>
+    </div>`;
+  renderKnowledgeList();
+
+  document.getElementById('know-chips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    state.knowledgeFilter = chip.dataset.cat;
+    document.querySelectorAll('#know-chips .chip').forEach(c => c.classList.toggle('active', c === chip));
+    renderKnowledgeList();
+  });
+  document.getElementById('know-search').addEventListener('input', () => renderKnowledgeList());
+}
+function renderKnowledgeList() {
+  const el = document.getElementById('know-list');
+  if (!el) return;
+  const q = (document.getElementById('know-search')?.value || '').trim().toLowerCase();
+  let list = state.knowledge;
+  if (state.knowledgeFilter !== 'all') list = list.filter(a => a.category === state.knowledgeFilter);
+  if (q) list = list.filter(a => (a.title + ' ' + a.summary).toLowerCase().includes(q));
+
+  if (state.knowledge.length === 0) { el.innerHTML = `<div class="empty"><div class="empty-icon">📚</div>ยังไม่มีบทความความรู้ — แอดมินสามารถเพิ่มได้ที่เมนู "จัดการความรู้"</div>`; return; }
+  if (list.length === 0) { el.innerHTML = `<div class="empty">ไม่พบบทความที่ค้นหา</div>`; return; }
+
+  el.innerHTML = list.map(a => `
+    <div class="know-card" onclick="openKnowledgeDetail(${a.rowIndex})">
+      <div class="know-icon">${a.image ? `<img src="${esc(a.image)}" onerror="this.parentElement.textContent='${knowledgeIcon(a.category)}'">` : knowledgeIcon(a.category)}</div>
+      <div class="know-body">
+        <div class="know-title">${esc(a.title)}</div>
+        <div class="know-summary">${esc(a.summary)}</div>
+        ${a.category ? `<span class="pill pill-purple" style="margin-top:6px;">${esc(a.category)}</span>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+function openKnowledgeDetail(rowIndex) {
+  const a = state.knowledge.find(x => x.rowIndex === rowIndex);
+  if (!a) return;
+  
+  let songCardHtml = '';
+  if (a.spotify) {
+    const songs = a.spotify.split(/[,\n]/).map(s => s.trim()).filter(s => s);
+    if (songs.length > 0) {
+      let cards = songs.map(songStr => {
+        const parts = songStr.split('|').map(p => p.trim());
+        let title = 'เปิดเพลงช่วยคุมจังหวะ CPR';
+        let imgUrl = 'https://raw.githubusercontent.com/wobsoriano/spotify-icon/master/spotify-icon.png';
+        let spotifyUrl = '#';
+        
+        if (parts.length === 1) {
+          spotifyUrl = parts[0];
+        } else if (parts.length === 2) {
+          title = parts[0];
+          spotifyUrl = parts[1];
+        } else if (parts.length >= 3) {
+          title = parts[0];
+          let rawImg = parts[1];
+          if (rawImg && rawImg.includes('drive.google.com/file/d/')) {
+            const match = rawImg.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            if (match) imgUrl = `https://drive.google.com/thumbnail?id=${match[1]}&sz=w800`;
+          } else if (rawImg) {
+            imgUrl = rawImg;
+          }
+          spotifyUrl = parts[2];
+        }
+        
+        return `
+          <a href="${esc(spotifyUrl)}" target="_blank" class="song-link-card">
+            <img src="${esc(imgUrl)}" alt="Song Cover" class="song-img" onerror="this.src='https://raw.githubusercontent.com/wobsoriano/spotify-icon/master/spotify-icon.png'">
+            <div class="song-info">
+              <div class="song-title">${esc(title)}</div>
+              <div class="song-desc">แตะเพื่อเปิดฟังบน Spotify 🎵</div>
+            </div>
+            <div class="song-icon">▶️</div>
+          </a>
+        `;
+      }).join('');
+      
+      songCardHtml = `
+        <div style="margin-top:16px; padding-top:16px; border-top:1.5px dashed var(--border);">
+          <div style="font-size:13.5px; color:var(--navy); font-weight:700; margin-bottom:10px;">🎧 เพลงคุมจังหวะ CPR (100-120 BPM)</div>
+          ${cards}
+        </div>
+      `;
+    }
+  }
+
+  openModal(`
+    <div class="modal-header"><h3 style="font-size:16px;">${esc(a.title)}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    
+    <div style="background: var(--red-bg); color: var(--red); padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+      <span style="font-size: 18px;">⚠️</span> หากทำการปฐมพยาบาลแล้ว อาการไม่ดีขึ้น โปรดพาผู้ป่วยส่งโรงพยาบาล หรือโทร 1669
+    </div>
+
+    ${a.image ? `<img src="${esc(a.image)}" style="max-width:100%; height:auto; display:block; margin:0 auto 14px; border-radius:12px;" onerror="this.style.display='none'">` : ''}
+    
+    ${a.category ? `<span class="pill pill-purple" style="margin-bottom:12px;">${esc(a.category)}</span>` : ''}
+    <div class="know-content">${esc(a.content || a.summary)}</div>
+    
+    ${songCardHtml}
+    
+    ${a.video ? `<div style="margin-top:16px;"><a href="${esc(a.video)}" target="_blank" class="btn btn-primary btn-block">▶️ ดูวิดีโอประกอบ</a></div>` : ''}
+    ${a.reference ? `<div style="margin-top:10px;"><a href="${esc(a.reference)}" target="_blank" class="btn btn-outline btn-block">🔗 ดูข้อมูลอ้างอิงจากต้นฉบับ</a></div>` : ''}
+  `);
+}
+
+/* ============================================================
+   VIEW: IMPORT (นำเข้ายา)
+   ============================================================ */
+function renderImportView() {
+  if (!state.importUnlocked) {
+    document.getElementById('content').innerHTML = `
+      <div class="card gate">
+        <div class="gate-icon">🔐</div>
+        <h3>นำเข้ายาและเวชภัณฑ์</h3>
+        <p>ใส่รหัสผ่านสำหรับการนำเข้าเพื่อป้องกันการแก้ไขสต๊อกโดยไม่ได้ตั้งใจ</p>
+        <div class="form-group"><input type="password" id="import-pass" placeholder="รหัสผ่านนำเข้า"></div>
+        <button class="btn btn-primary btn-block" onclick="unlockImport()">ปลดล็อก</button>
+      </div>`;
+    return;
+  }
+  
+  const options = `<option value="">-- เลือกรายการยา --</option>` + state.medicines.map(m => `<option value="${m.rowIndex}">${esc(m.name)} (คงเหลือ ${m.stock} ${esc(m.unit)})</option>`).join('');
+  const caretakerOptions = `<option value="">-- เลือกผู้นำเข้า (ผู้ดูแล) --</option>` + state.caretakers.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+
+  let cartHtml = (state.importCart || []).map((c, i) => `
+    <div class="cart-item">
+      <div class="med-info">
+        <div class="med-name">${esc(c.name)}</div>
+        <div class="med-sub">นำเข้า: ${c.qty} ${esc(c.unit)} | Lot: ${esc(c.lot || '-')}</div>
+      </div>
+      <button class="cart-remove" onclick="removeImportItem(${i})">✕</button>
+    </div>
+  `).join('');
+  
+  if (!cartHtml) cartHtml = `<div class="empty" style="padding:10px; border: 1.5px dashed var(--border); border-radius: 13px;">ยังไม่มีรายการรอนำเข้า</div>`;
+
+  document.getElementById('content').innerHTML = `
+    <div class="card">
+      <div class="section-title"><h2>📥 1. เพิ่มรายการลงตะกร้านำเข้า</h2></div>
+      <div class="form-group">
+        <label>เลือกรายการยา</label>
+        <select id="im-item" onchange="onImportItemChange()">${options}</select>
+      </div>
+      <div id="im-preview"></div>
+      <div class="form-row">
+        <div class="form-group"><label>จำนวนที่นำเข้า</label><input type="number" id="im-qty" min="1" value="1"></div>
+        <div class="form-group"><label>Lot / วันหมดอายุใหม่</label><input type="text" id="im-lot" placeholder="เช่น 01/05/2028"></div>
+      </div>
+      <button class="btn btn-outline btn-block" onclick="addImportItem()">+ เพิ่มลงรายการรอนำเข้า</button>
+    </div>
+
+    <div class="card">
+      <div class="section-title"><h2>📋 2. รายการที่รอนำเข้า และ ยืนยัน</h2></div>
+      <div style="margin-bottom: 14px;">${cartHtml}</div>
+      <div class="form-group"><label>ผู้นำเข้า (อิงจากรายชื่อผู้ดูแล)</label><select id="im-by">${caretakerOptions}</select></div>
+      <div class="form-group"><label>หมายเหตุ (ไม่บังคับ)</label><textarea id="im-note" rows="2"></textarea></div>
+      <button class="btn btn-primary btn-block" id="im-submit" onclick="submitImport()">บันทึกการนำเข้าทั้งหมด</button>
+    </div>`;
+}
+
+function onImportItemChange() {
+  const rowIndex = Number(document.getElementById('im-item').value);
+  const item = state.medicines.find(m => m.rowIndex === rowIndex);
+  const box = document.getElementById('im-preview');
+  if (!item) { box.innerHTML = ''; return; }
+  box.innerHTML = `
+    <div class="med-item ${categoryClass(item.category)}" style="cursor:default;margin-bottom:14px;">
+      ${thumbHtml(item, 'lg')}
+      <div class="med-info">
+        <div class="med-name">${esc(item.name)}</div>
+        <div class="med-sub">คงเหลือเดิม ${item.stock} ${esc(item.unit)}</div>
+      </div>
+    </div>`;
+}
+
+function addImportItem() {
+  const rowIndex = Number(document.getElementById('im-item').value);
+  const item = state.medicines.find(m => m.rowIndex === rowIndex);
+  if (!item) return showToast('กรุณาเลือกรายการยา', 'error');
+  const qty = Number(document.getElementById('im-qty').value);
+  const lot = document.getElementById('im-lot').value.trim();
+  if (!qty || qty <= 0) return showToast('กรอกจำนวนให้ถูกต้อง', 'error');
+
+  state.importCart = state.importCart || [];
+  state.importCart.push({ name: item.name, qty, unit: item.unit, lot });
+  document.getElementById('im-item').value = '';
+  document.getElementById('im-qty').value = 1;
+  document.getElementById('im-lot').value = '';
+  document.getElementById('im-preview').innerHTML = '';
+  renderImportView();
+}
+
+function removeImportItem(index) {
+  state.importCart.splice(index, 1);
+  renderImportView();
+}
+
+async function unlockImport() {
+  const pass = document.getElementById('import-pass').value;
+  if (!pass) return showToast('กรุณาใส่รหัสผ่าน', 'error');
+  try {
+    const res = await api('checkImportPasscode', { password: pass });
+    if (res.ok) { state.importUnlocked = true; state.importPasscode = pass; render(); }
+    else showToast(res.error || 'รหัสผ่านไม่ถูกต้อง', 'error');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+async function submitImport() {
+  if (!state.importCart || state.importCart.length === 0) return showToast('กรุณาเพิ่มรายการลงตะกร้าก่อน', 'error');
+  const importer = document.getElementById('im-by').value;
+  const note = document.getElementById('im-note').value.trim();
+  if (!importer) return showToast('กรุณาเลือกผู้นำเข้า', 'error');
+
+  const btn = document.getElementById('im-submit');
+  btn.disabled = true; btn.textContent = 'กำลังบันทึก...';
+  
+  try {
+    let allOk = true;
+    let lastResponse = null;
+
+    for (const c of state.importCart) {
+      const res = await api('submitImport', { itemName: c.name, qty: c.qty, importer: importer, lot: c.lot, note: note, password: state.importPasscode });
+      if (!res.ok) allOk = false;
+      else lastResponse = res;
+    }
+    
+    if (allOk) {
+      showToast('บันทึกการนำเข้าเรียบร้อย ✓', 'success');
+      if(lastResponse) {
+          const lastItem = state.importCart[state.importCart.length-1];
+          state.lastAction = { type: 'import', item: lastItem.name, qty: lastItem.qty, unit: lastItem.unit, importer, lot: lastItem.lot, note, remaining: lastResponse.remaining, timestamp: lastResponse.timestamp };
+      }
+      state.importCart = [];
+      await loadMedicines();
+      render();
+    } else {
+      showToast('เกิดข้อผิดพลาดในการบันทึกบางรายการ', 'error');
+    }
+  } catch (err) { showToast(err.message, 'error'); }
+  btn.disabled = false; btn.textContent = 'บันทึกการนำเข้าทั้งหมด';
+}
+
+/* ============================================================
+   VIEW: REPORTS / PRINT (A4, Standard sizes adjusted)
+   ============================================================ */
+function renderReportsView() {
+  document.getElementById('content').innerHTML = `
+    <div class="card">
+      <div class="section-title"><h2>🖨️ พิมพ์รายงาน</h2></div>
+      <div class="admin-menu">
+        <button onclick="printFullList()"><span class="amicon">📋</span><span class="amtitle">รายการยาทั้งหมด (คงเหลือปัจจุบัน)</span></button>
+        <button onclick="openReportRangeModal('request')"><span class="amicon">📤</span><span class="amtitle">ประวัติการเบิก ตามช่วงวันที่</span></button>
+        <button onclick="openReportRangeModal('import')"><span class="amicon">📥</span><span class="amtitle">ประวัติการนำเข้า ตามช่วงวันที่</span></button>
+        <button onclick="printLastSlip()"><span class="amicon">🎫</span><span class="amtitle">ใบเบิก/นำเข้าล่าสุด</span></button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title"><h2>ดูใครใช้ยาไปเท่าไหร่ในแต่ละเดือน</h2></div>
+      <div class="section-hint">เลือกช่วงวันที่แล้วกด "ดูตัวอย่าง" เพื่อดูสรุปการเบิกแยกตามผู้ใช้ ก่อนสั่งพิมพ์</div>
+      <div class="form-row">
+        <div class="form-group"><label>ตั้งแต่วันที่</label><input type="date" id="rep-from"></div>
+        <div class="form-group"><label>ถึงวันที่</label><input type="date" id="rep-to"></div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="previewUsageReport()">ดูตัวอย่างรายงาน</button>
+      <div id="usage-report-preview" style="margin-top:16px;"></div>
+    </div>`;
+}
+
+function openReportRangeModal(type) {
+  openModal(`
+    <div class="modal-header"><h3>${type === 'request' ? 'พิมพ์ประวัติการเบิก' : 'พิมพ์ประวัติการนำเข้า'}</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="form-row">
+      <div class="form-group"><label>ตั้งแต่วันที่</label><input type="date" id="pr-from"></div>
+      <div class="form-group"><label>ถึงวันที่</label><input type="date" id="pr-to"></div>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="printHistory('${type}')">🖨️ พิมพ์</button>
+  `);
+}
+
+/* ============================================================
+   PRINT PREVIEW MODE
+   ============================================================ */
+function enterPrintPreview() {
+  document.body.classList.add('print-mode');
+  
+  const controls = document.createElement('div');
+  controls.id = 'print-controls';
+  controls.style.cssText = 'position:fixed; top:20px; right:20px; display:flex; gap:10px; z-index:9999;';
+  controls.innerHTML = `
+    <button class="btn btn-danger" style="box-shadow:0 4px 12px rgba(0,0,0,0.3);" onclick="exitPrintPreview()">❌ ยกเลิก/กลับ</button>
+    <button class="btn btn-primary" style="box-shadow:0 4px 12px rgba(0,0,0,0.3);" onclick="window.print()">🖨️ ยืนยันการพิมพ์</button>
+  `;
+  document.body.appendChild(controls);
+  
+  window.scrollTo(0,0);
+  showToast('แตะที่ข้อความในวงเล็บ เพื่อแก้ไขชื่อก่อนพิมพ์ได้ครับ', 'success');
+}
+
+function exitPrintPreview() {
+  document.body.classList.remove('print-mode');
+  const controls = document.getElementById('print-controls');
+  if(controls) controls.remove();
+}
+
+async function printHistory(type) {
+  const from = document.getElementById('pr-from').value;
+  const to = document.getElementById('pr-to').value;
+  try {
+    const res = await api('getHistory', { type, from, to });
+    if (!res.ok) return showToast(res.error, 'error');
+    closeModal();
+    buildHistoryPrintArea(type, res.records, from, to);
+    enterPrintPreview();
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+function buildHistoryPrintArea(type, records, from, to) {
+  const title = type === 'request' ? 'ประวัติการเบิกยาและเวชภัณฑ์' : 'ประวัติการนำเข้ายาและเวชภัณฑ์';
+  const headers = type === 'request'
+    ? ['วันที่เบิก','รหัสพนักงาน','ชื่อ-สกุล','ชื่อยา','จำนวน','หน่วย','ผู้ดูแล']
+    : ['วันที่เวลา','ชื่อยา','จำนวน','หน่วย','ผู้นำเข้า','Lot'];
+    
+  const keys = type === 'request'
+    ? ['วันที่เบิก','รหัสพนักงาน','ชื่อ-สกุล','ชื่อยา','จำนวนที่เบิก','หน่วย','ผู้ดูแล']
+    : ['วันที่เวลา','ชื่อยา','จำนวนนำเข้า','หน่วย','ผู้นำเข้า','Lot / วันหมดอายุใหม่'];
+
+  let rows = records.map(r => `<tr>${keys.map((k, index) => {
+    // ป้องกันคอลัมน์สั้นๆ หดตกขอบ เช่น วันที่, รหัส, จำนวน, หน่วย
+    const noWrap = (index === 0 || index === 1 || index === 4 || index === 5) ? 'white-space:nowrap;' : '';
+    return `<td style="padding:6px 4px; border-bottom:1px dotted #ccc; font-size:14pt; text-align:left; vertical-align:top; ${noWrap}">${esc((k === 'วันที่เวลา' || k === 'วันที่เบิก') ? formatDate(r[k]) : r[k])}</td>`;
+  }).join('')}</tr>`).join('');
+  
+  document.getElementById('print-area').innerHTML = `
+    <div style="font-family:'TH Sarabun New','Sarabun',sans-serif; width:100%; box-sizing:border-box; color:#000;">
+      
+      <h1 style="font-family:'TH Sarabun New','Sarabun',sans-serif; font-weight:bold; color:#000; font-size:20pt; text-align:center; margin-bottom:12px; line-height:1.2;">
+        รายการยา และเวชภัณฑ์ ประจำ ครัวการบิน กรุงเทพ ดอนเมือง จำกัด
+      </h1>
+
+      <div style="font-size:14pt; line-height:1.6; text-indent:2.5em; margin-bottom:18px; text-align:justify; color:#000;">
+        เอกสารชุดนี้จัดทำขึ้นเพื่อบันทึกรายการยาและเวชภัณฑ์ที่มีอยู่ประจำบริษัทครัวการบินกรุงเทพดอนเมือง โดยแสดงรายละเอียดชื่อยา ปริมาณ วันหมดอายุ และสถานะการใช้งานปัจจุบัน เพื่อใช้ในการตรวจสอบและควบคุมสต๊อกให้ถูกต้องตามมาตรฐาน ทั้งนี้ข้อมูลจะถูกปรับปรุงและตรวจสอบเป็นระยะ เพื่อให้มั่นใจว่ายาที่ใช้ในการปฐมพยาบาลและการดูแลเบื้องต้นมีความพร้อม ปลอดภัย และสามารถนำมาใช้ได้จริงเมื่อเกิดเหตุฉุกเฉินหรือมีความจำเป็น
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:14pt;">
+        <span style="font-weight:bold;">${title}</span>
+        <span>พิมพ์เมื่อ: ${formatDate(new Date().toISOString())}</span>
+      </div>
+
+      <table style="width:100%; border-collapse:collapse; font-size:14pt; text-align:left; margin-bottom:30px;">
+        <thead>
+          <tr>${headers.map((h, i) => {
+            const noWrap = (i === 0 || i === 1 || i === 4 || i === 5) ? 'white-space:nowrap;' : '';
+            return `<th style="background:#f0f0f0; color:#000; padding:8px 4px; border-bottom:2px solid #000; font-size:14pt; font-weight:bold; vertical-align:top; ${noWrap}">${h}</th>`;
+          }).join('')}</tr>
+        </thead>
+        <tbody>${rows || `<tr><td colspan="${headers.length}" style="padding:12px; text-align:center; font-size:14pt;">ไม่มีข้อมูลในช่วงที่เลือก</td></tr>`}</tbody>
+      </table>
+
+      <div style="margin-top:40px; font-size:14pt; page-break-inside:avoid;">
+        <div style="display:flex; justify-content:space-around; text-align:center; margin-bottom:40px;">
+          <div>
+            <div>ลงชื่อ....................................................</div>
+            <div style="margin-top:6px;">( <span class="editable-field" contenteditable="true">พิมพ์ชื่อ-สกุล</span> )</div>
+            <div style="margin-top:4px; font-weight:bold;">ผู้ตรวจสอบ</div>
+          </div>
+          <div>
+            <div>ลงชื่อ....................................................</div>
+            <div style="margin-top:6px;">( <span class="editable-field" contenteditable="true">พิมพ์ชื่อ-สกุล</span> )</div>
+            <div style="margin-top:4px; font-weight:bold;">หัวหน้างานผู้อนุมัติ</div>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:center; text-align:center;">
+          <div>
+            <div>ลงชื่อ....................................................</div>
+            <div style="margin-top:6px;">( <span class="editable-field" contenteditable="true">พิมพ์ชื่อ-สกุล</span> )</div>
+            <div style="margin-top:4px; font-weight:bold;">จป. วิชาชีพ</div>
+          </div>
+        </div>
+      </div>
+
+    </div>`;
+}
+
+function printFullList() {
+  const rows = state.medicines.map((m, index) => {
+    const st = stockStatus(m);
+    const d = parseThaiDate(m.expiry);
+    const days = d ? Math.ceil((d.getTime() - new Date().getTime()) / 86400000) : null;
+    const daysLabel = days === null ? '-' : (days < 0 ? 'หมดอายุ' : 'เหลือ ' + days + ' วัน');
+    return `<tr>
+      <td style="padding:6px 4px; border-bottom:1px dotted #ccc; font-size:14pt; vertical-align:top; text-align:center; white-space:nowrap;">${index + 1}</td>
+      <td style="padding:6px 4px; border-bottom:1px dotted #ccc; font-size:14pt; vertical-align:top; white-space:nowrap;">${esc(m.category)}</td>
+      <td style="padding:6px 4px; border-bottom:1px dotted #ccc; font-size:14pt; font-weight:bold; vertical-align:top;">${esc(m.name)}</td>
+      <td style="padding:6px 4px; border-bottom:1px dotted #ccc; font-size:14pt; vertical-align:top; white-space:nowrap;">${esc(m.volume)}</td>
+      <td style="padding:6px 4px; border-bottom:1px dotted #ccc; font-size:14pt; vertical-align:top; white-space:nowrap;">${esc(m.unit)}</td>
+      <td style="padding:6px 4px; border-bottom:1px dotted #ccc; font-size:14pt; vertical-align:top; text-align:center; white-space:nowrap;">${m.stock}</td>
+      <td style="padding:6px 4px; border-bottom:1px dotted #ccc; font-size:14pt; vertical-align:top; white-space:nowrap;">${formatDisplayDate(m.expiry)}</td>
+      <td style="padding:6px 4px; border-bottom:1px dotted #ccc; font-size:14pt; vertical-align:top; white-space:nowrap;">${st.label}</td>
+    </tr>`;
+  }).join('');
+  
+  document.getElementById('print-area').innerHTML = `
+    <div style="font-family:'TH Sarabun New','Sarabun',sans-serif; width:100%; box-sizing:border-box; color:#000;">
+      
+      <h1 style="font-family:'TH Sarabun New','Sarabun',sans-serif; font-weight:bold; color:#000; font-size:20pt; text-align:center; margin-bottom:12px; line-height:1.2;">
+        รายการยา และเวชภัณฑ์ ประจำ ครัวการบิน กรุงเทพ ดอนเมือง จำกัด
+      </h1>
+
+      <div style="font-size:14pt; line-height:1.6; text-indent:2.5em; margin-bottom:18px; text-align:justify; color:#000;">
+        เอกสารชุดนี้จัดทำขึ้นเพื่อบันทึกรายการยาและเวชภัณฑ์ที่มีอยู่ประจำบริษัทครัวการบินกรุงเทพดอนเมือง โดยแสดงรายละเอียดชื่อยา ปริมาณ วันหมดอายุ และสถานะการใช้งานปัจจุบัน เพื่อใช้ในการตรวจสอบและควบคุมสต๊อกให้ถูกต้องตามมาตรฐาน ทั้งนี้ข้อมูลจะถูกปรับปรุงและตรวจสอบเป็นระยะ เพื่อให้มั่นใจว่ายาที่ใช้ในการปฐมพยาบาลและการดูแลเบื้องต้นมีความพร้อม ปลอดภัย และสามารถนำมาใช้ได้จริงเมื่อเกิดเหตุฉุกเฉินหรือมีความจำเป็น
+      </div>
+
+      <div style="text-align:right; font-size:14pt; margin-bottom:10px;">
+        พิมพ์เมื่อ: ${formatDate(new Date().toISOString())}
+      </div>
+
+      <table style="width:100%; border-collapse:collapse; font-size:14pt; text-align:left; margin-bottom:30px;">
+        <thead>
+          <tr>
+            <th style="background:#f0f0f0; color:#000; padding:8px 4px; border-bottom:2px solid #000; font-weight:bold; vertical-align:top; text-align:center; white-space:nowrap;">ลำดับ</th>
+            <th style="background:#f0f0f0; color:#000; padding:8px 4px; border-bottom:2px solid #000; font-weight:bold; vertical-align:top; white-space:nowrap;">หมวดหมู่</th>
+            <th style="background:#f0f0f0; color:#000; padding:8px 4px; border-bottom:2px solid #000; font-weight:bold; vertical-align:top;">ชื่อยาและเวชภัณฑ์</th>
+            <th style="background:#f0f0f0; color:#000; padding:8px 4px; border-bottom:2px solid #000; font-weight:bold; vertical-align:top; white-space:nowrap;">ปริมาตร</th>
+            <th style="background:#f0f0f0; color:#000; padding:8px 4px; border-bottom:2px solid #000; font-weight:bold; vertical-align:top; white-space:nowrap;">หน่วย</th>
+            <th style="background:#f0f0f0; color:#000; padding:8px 4px; border-bottom:2px solid #000; font-weight:bold; vertical-align:top; text-align:center; white-space:nowrap;">คงเหลือ</th>
+            <th style="background:#f0f0f0; color:#000; padding:8px 4px; border-bottom:2px solid #000; font-weight:bold; vertical-align:top; white-space:nowrap;">หมดอายุ</th>
+            <th style="background:#f0f0f0; color:#000; padding:8px 4px; border-bottom:2px solid #000; font-weight:bold; vertical-align:top; white-space:nowrap;">สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+
+      <div style="margin-top:40px; font-size:14pt; page-break-inside:avoid;">
+        <div style="display:flex; justify-content:space-around; text-align:center; margin-bottom:40px;">
+          <div>
+            <div>ลงชื่อ....................................................</div>
+            <div style="margin-top:6px;">( <span class="editable-field" contenteditable="true">พิมพ์ชื่อ-สกุล</span> )</div>
+            <div style="margin-top:4px; font-weight:bold;">ผู้ตรวจสอบ</div>
+          </div>
+          <div>
+            <div>ลงชื่อ....................................................</div>
+            <div style="margin-top:6px;">( <span class="editable-field" contenteditable="true">พิมพ์ชื่อ-สกุล</span> )</div>
+            <div style="margin-top:4px; font-weight:bold;">หัวหน้างานผู้อนุมัติ</div>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:center; text-align:center;">
+          <div>
+            <div>ลงชื่อ....................................................</div>
+            <div style="margin-top:6px;">( <span class="editable-field" contenteditable="true">พิมพ์ชื่อ-สกุล</span> )</div>
+            <div style="margin-top:4px; font-weight:bold;">จป. วิชาชีพ</div>
+          </div>
+        </div>
+      </div>
+
+    </div>`;
+  enterPrintPreview();
+}
+
+function printLastSlip() {
+  if (!state.lastAction) return showToast('ยังไม่มีรายการเบิก/นำเข้าล่าสุดในเซสชันนี้', 'error');
+  printSlip();
+}
+
+function printSlip() {
+  const a = state.lastAction;
+  if (!a) return;
+  const isReq = a.type === 'request';
+  let bodyHtml;
+  
+  if (isReq) {
+    const itemRows = a.items.map(it => `<tr><td style="padding:6px 0; border-bottom:1px dashed #ddd; font-size:14pt;">${esc(it.name)}</td><td style="padding:6px 0; text-align:right; border-bottom:1px dashed #ddd; font-size:14pt;">${it.qty} ${esc(it.unit)}</td></tr>`).join('');
+    bodyHtml = `
+      <div style="display:flex; justify-content:space-between; margin-bottom:16px; font-size:14pt;">
+        <div><div style="color:#444;">วันที่เบิก</div><div>${formatDate(a.date)}</div></div>
+        <div style="text-align:right;"><div style="color:#444;">เลขที่อ้างอิง</div><div>${esc(a.requestId||'-')}</div></div>
+      </div>
+      <div style="margin-bottom:16px; font-size:14pt;">
+        <div style="color:#444;">พนักงานผู้เบิก</div>
+        <div style="font-size:14pt; font-weight:bold;">${esc(a.employeeId)} — ${esc(a.employeeName)}</div>
+      </div>
+      ${a.symptom ? `<div style="margin-bottom:16px; font-size:14pt;"><div style="color:#444;">อาการที่พบ</div><div>${esc(a.symptom)}</div></div>` : ''}
+      <div style="margin-bottom:16px;">
+        <div style="color:#444; font-size:14pt; margin-bottom:6px;">รายการยาและเวชภัณฑ์</div>
+        <table style="width:100%; border-collapse:collapse;">${itemRows}</table>
+      </div>
+      <div style="margin-bottom:16px; font-size:14pt;">
+        <div style="color:#444;">ผู้ดูแล/จ่ายยา</div>
+        <div>${esc(a.caretaker)}</div>
+      </div>
+      ${a.note ? `<div style="margin-bottom:16px; font-size:14pt;"><div style="color:#444;">หมายเหตุ</div><div>${a.note}</div></div>` : ''}`;
+  } else {
+    bodyHtml = `
+      <div style="display:flex; justify-content:space-between; margin-bottom:16px; font-size:14pt;">
+        <div><div style="color:#444;">วันที่นำเข้า</div><div>${formatDate(a.timestamp)}</div></div>
+      </div>
+      <div style="margin-bottom:16px; font-size:14pt;">
+        <div style="color:#444;">รายการยา/เวชภัณฑ์</div>
+        <div style="font-size:14pt; font-weight:bold;">${esc(a.item)}</div>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:16px; font-size:14pt;">
+        <div><div style="color:#444;">จำนวนที่นำเข้า</div><div style="font-size:14pt;">${a.qty} ${esc(a.unit)}</div></div>
+        <div style="text-align:right;"><div style="color:#444;">คงเหลือล่าสุด</div><div style="font-size:14pt;">${a.remaining} ${esc(a.unit)}</div></div>
+      </div>
+      <div style="margin-bottom:16px; font-size:14pt;">
+        <div style="color:#444;">ผู้นำเข้าบันทึก</div>
+        <div>${esc(a.importer)}</div>
+      </div>
+      ${a.lot ? `<div style="margin-bottom:16px; font-size:14pt;"><div style="color:#444;">Lot / วันหมดอายุ</div><div>${formatDisplayDate(a.lot)}</div></div>` : ''}`;
+  }
+
+  document.getElementById('print-area').innerHTML = `
+    <div style="width:100%; margin:0 auto; font-family:'TH Sarabun New','Sarabun',sans-serif; color:#000; box-sizing:border-box;">
+      
+      <h1 style="font-family:'TH Sarabun New','Sarabun',sans-serif; font-weight:bold; color:#000; font-size:20pt; text-align:center; margin-bottom:12px; line-height:1.2;">
+        รายการยา และเวชภัณฑ์ ประจำ ครัวการบิน กรุงเทพ ดอนเมือง จำกัด
+      </h1>
+
+      <div style="font-size:14pt; line-height:1.6; text-indent:2.5em; margin-bottom:18px; text-align:justify; color:#000;">
+        เอกสารชุดนี้จัดทำขึ้นเพื่อบันทึกรายการยาและเวชภัณฑ์ที่มีอยู่ประจำบริษัทครัวการบินกรุงเทพดอนเมือง โดยแสดงรายละเอียดชื่อยา ปริมาณ วันหมดอายุ และสถานะการใช้งานปัจจุบัน เพื่อใช้ในการตรวจสอบและควบคุมสต๊อกให้ถูกต้องตามมาตรฐาน ทั้งนี้ข้อมูลจะถูกปรับปรุงและตรวจสอบเป็นระยะ เพื่อให้มั่นใจว่ายาที่ใช้ในการปฐมพยาบาลและการดูแลเบื้องต้นมีความพร้อม ปลอดภัย และสามารถนำมาใช้ได้จริงเมื่อเกิดเหตุฉุกเฉินหรือมีความจำเป็น
+      </div>
+
+      <div style="border-top:2px solid #000; border-bottom:2px solid #000; padding:12px 0; margin-bottom:20px;">
+        <h3 style="text-align:center; font-size:14pt; font-weight:bold; margin-bottom:10px;">
+          ${isReq ? 'ใบเบิกจ่ายยาและเวชภัณฑ์' : 'ใบนำเข้ายาและเวชภัณฑ์'}
+        </h3>
+        ${bodyHtml}
+      </div>
+
+      <div style="margin-top:40px; font-size:14pt; page-break-inside:avoid;">
+        <div style="display:flex; justify-content:space-around; text-align:center; margin-bottom:40px;">
+          <div>
+            <div>ลงชื่อ....................................................</div>
+            <div style="margin-top:6px;">( <span class="editable-field" contenteditable="true">พิมพ์ชื่อ-สกุล</span> )</div>
+            <div style="margin-top:4px; font-weight:bold;">ผู้ตรวจสอบ</div>
+          </div>
+          <div>
+            <div>ลงชื่อ....................................................</div>
+            <div style="margin-top:6px;">( <span class="editable-field" contenteditable="true">พิมพ์ชื่อ-สกุล</span> )</div>
+            <div style="margin-top:4px; font-weight:bold;">หัวหน้างานผู้อนุมัติ</div>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:center; text-align:center;">
+          <div>
+            <div>ลงชื่อ....................................................</div>
+            <div style="margin-top:6px;">( <span class="editable-field" contenteditable="true">พิมพ์ชื่อ-สกุล</span> )</div>
+            <div style="margin-top:4px; font-weight:bold;">จป. วิชาชีพ</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top:30px; font-size:14pt; color:#666;">
+        บันทึกในระบบเมื่อ: ${formatDate(a.timestamp)}
+      </div>
+
+    </div>`;
+  enterPrintPreview();
+}
+
+async function previewUsageReport() {
+  const from = document.getElementById('rep-from').value;
+  const to = document.getElementById('rep-to').value;
+  try {
+    const res = await api('getHistory', { type: 'request', from, to });
+    if (!res.ok) return showToast(res.error, 'error');
+    const byPerson = {};
+    res.records.forEach(r => {
+      const p = r['ชื่อ-สกุล'] || 'ไม่ระบุ';
+      byPerson[p] = (byPerson[p] || 0) + Number(r['จำนวนที่เบิก'] || 0);
+    });
+    const sorted = Object.entries(byPerson).sort((a, b) => b[1] - a[1]);
+    const max = sorted.length ? sorted[0][1] : 1;
+    let html = `<h3 style="margin-bottom:10px;">สรุปตามผู้เบิก (${res.records.length} รายการ)</h3>`;
+    if (sorted.length === 0) html += `<div class="empty">ไม่มีข้อมูลในช่วงที่เลือก</div>`;
+    sorted.forEach(([name, qty]) => {
+      html += `<div class="bar-row"><div class="bar-label">${esc(name)}</div><div class="bar-track"><div class="bar-fill" style="width:${(qty/max*100)}%"></div></div><div class="bar-value">${qty}</div></div>`;
+    });
+    document.getElementById('usage-report-preview').innerHTML = html;
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+/* ============================================================
+   VIEW: ADMIN
+   ============================================================ */
+function renderAdminView() {
+  if (!state.isAdmin) {
+    document.getElementById('content').innerHTML = `
+      <div class="card gate">
+        <div class="gate-icon">🛡️</div>
+        <h3>เข้าสู่ระบบแอดมิน</h3>
+        <p>สำหรับเจ้าหน้าที่ความปลอดภัยและอาชีวอนามัยเท่านั้น</p>
+        <div class="form-group"><input type="password" id="admin-pass" placeholder="รหัสผ่านแอดมิน"></div>
+        <button class="btn btn-navy btn-block" onclick="adminLogin()">เข้าสู่ระบบ</button>
+      </div>`;
+    return;
+  }
+  document.getElementById('content').innerHTML = `
+    <div class="card">
+      <div class="section-title"><h2>🛡️ เมนูแอดมิน</h2><button class="btn btn-outline btn-sm" onclick="adminLogout()">ออกจากระบบ</button></div>
+      <div class="admin-menu">
+        <button onclick="renderDashboard()"><span class="amicon">📊</span><span class="amtitle">แดชบอร์ดภาพรวม</span></button>
+        <button onclick="renderManageMedicines()"><span class="amicon">🗂️</span><span class="amtitle">จัดการรายการยา</span></button>
+        <button onclick="renderManageKnowledge()"><span class="amicon">📚</span><span class="amtitle">จัดการความรู้</span></button>
+        <button onclick="renderAdminHistory()"><span class="amicon">🧾</span><span class="amtitle">ประวัติทั้งหมด</span></button>
+        <button onclick="renderAdminSettings()"><span class="amicon">⚙️</span><span class="amtitle">ตั้งค่ารหัสผ่าน</span></button>
+      </div>
+    </div>
+    <div id="admin-sub"></div>`;
+  renderDashboard();
+}
+async function adminLogin() {
+  const pass = document.getElementById('admin-pass').value;
+  if (!pass) return showToast('กรุณาใส่รหัสผ่าน', 'error');
+  try {
+    const res = await api('adminLogin', { password: pass });
+    if (res.ok) { state.isAdmin = true; state.adminPassword = pass; render(); }
+    else showToast(res.error || 'รหัสผ่านไม่ถูกต้อง', 'error');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+function adminLogout() { state.isAdmin = false; state.adminPassword = ''; render(); }
+
+async function renderDashboard() {
+  const sub = document.getElementById('admin-sub');
+  sub.innerHTML = `<div class="card"><div class="empty">กำลังโหลดแดชบอร์ด...</div></div>`;
+  try {
+    const res = await api('getDashboard');
+    if (!res.ok) return showToast(res.error, 'error');
+    state.dashboard = res;
+
+    let lowStockHtml = res.lowStock.length === 0
+      ? `<div class="empty" style="padding:16px;">✅ ไม่มีรายการใกล้หมด</div>`
+      : res.lowStock.map(i => `
+        <div class="med-item" style="cursor:default;">
+          ${thumbHtml(i)}
+          <div class="med-info"><div class="med-name">${esc(i.name)}</div><div class="med-sub">${esc(i.category)} ${expiryBadge(i)}</div></div>
+          <div class="med-stock"><span class="qty" style="color:var(--red)">${i.stock}</span> <span style="font-size:11px;color:var(--muted)">/${i.reorderPoint} ${esc(i.unit)}</span></div>
+        </div>`).join('');
+
+    const maxUsage = res.usageByItem.length ? res.usageByItem[0].qty : 1;
+    let usageItemHtml = res.usageByItem.slice(0, 8).map(u => `
+      <div class="bar-row"><div class="bar-label">${esc(u.name)}</div><div class="bar-track"><div class="bar-fill" style="width:${(u.qty/maxUsage*100)}%"></div></div><div class="bar-value">${u.qty}</div></div>`).join('') || `<div class="empty">ยังไม่มีข้อมูลการเบิก</div>`;
+
+    const maxPerson = res.usageByPerson.length ? res.usageByPerson[0].qty : 1;
+    let usagePersonHtml = res.usageByPerson.slice(0, 8).map(u => `
+      <div class="bar-row"><div class="bar-label">${esc(u.name)}</div><div class="bar-track"><div class="bar-fill" style="width:${(u.qty/maxPerson*100)}%; background:linear-gradient(90deg,var(--green),#1F7A54);"></div></div><div class="bar-value">${u.qty}</div></div>`).join('') || `<div class="empty">ยังไม่มีข้อมูลการเบิก</div>`;
+
+    sub.innerHTML = `
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-value">${res.totalItems}</div><div class="stat-label">รายการยาทั้งหมด</div></div>
+        <div class="stat-card"><div class="stat-value" style="color:var(--red)">${res.lowStock.length}</div><div class="stat-label">รายการใกล้หมด/หมด</div></div>
+        <div class="stat-card"><div class="stat-value">${res.totalRequests}</div><div class="stat-label">จำนวนใบเบิกทั้งหมด</div></div>
+        <div class="stat-card"><div class="stat-value" style="font-size:15px;">${res.topUser ? esc(res.topUser.name) : '-'}</div><div class="stat-label">ผู้เบิกสูงสุด (${res.topUser ? res.topUser.qty : 0} หน่วย)</div></div>
+      </div>
+      <div class="card"><div class="section-title"><h2>⚠️ รายการใกล้หมด</h2></div>${lowStockHtml}</div>
+      <div class="card"><div class="section-title"><h2>📦 ยอดการใช้ต่อรายการ (สูงสุด 8)</h2></div>${usageItemHtml}</div>
+      <div class="card"><div class="section-title"><h2>👤 ยอดการเบิกต่อคน (สูงสุด 8)</h2></div>${usagePersonHtml}</div>`;
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+async function renderManageMedicines() {
+  const sub = document.getElementById('admin-sub');
+  sub.innerHTML = `<div class="card"><div class="empty">กำลังโหลด...</div></div>`;
+  await loadMedicines();
+  const rows = state.medicines.map(m => `
+    <tr>
+      <td>${thumbHtml(m, 'sm')}</td><td>${esc(m.id)}</td><td>${esc(m.category)}</td><td>${esc(m.name)}</td>
+      <td>${esc(m.unit)}</td><td>${m.stock}</td><td>${formatDisplayDate(m.expiry)}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-outline btn-sm" onclick="openEditMedicine(${m.rowIndex})">แก้ไข</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmDeleteMedicine(${m.rowIndex}, '${esc(m.name).replace(/'/g,"\\'")}')">ลบ</button>
+      </td>
+    </tr>`).join('');
+  sub.innerHTML = `
+    <div class="card">
+      <div class="section-title"><h2>🗂️ จัดการรายการยา</h2><button class="btn btn-primary btn-sm" onclick="openAddMedicine()">+ เพิ่มรายการ</button></div>
+      <div class="section-hint">ใส่ลิงก์รูปภาพในช่อง "รูปภาพ (URL)" และ "ข้อบ่งใช้/วิธีใช้" เพื่อให้แสดงเป็นป็อปอัปให้พนักงานอ่านก่อนยืนยันเบิกทุกครั้ง</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>รูป</th><th>ลำดับ</th><th>หมวดหมู่</th><th>ชื่อยา</th><th>หน่วย</th><th>คงเหลือ</th><th>วันหมดอายุ</th><th></th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>
+    </div>`;
+}
+function medicineFormFields(m = {}) {
+  return `
+    <div class="form-group"><label>หมวดหมู่</label>
+      <select id="mf-category">${['ยากิน','ยาใช้ภายนอก','เวชภัณฑ์'].map(c => `<option value="${c}" ${m.category===c?'selected':''}>${c}</option>`).join('')}</select>
+    </div>
+    <div class="form-group"><label>ชื่อยาและเวชภัณฑ์</label><input type="text" id="mf-name" value="${esc(m.name||'')}"></div>
+    <div class="form-row">
+      <div class="form-group"><label>ปริมาตร</label><input type="text" id="mf-volume" value="${esc(m.volume||'')}"></div>
+      <div class="form-group"><label>หน่วย</label><input type="text" id="mf-unit" value="${esc(m.unit||'')}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>คงเหลือ</label><input type="number" id="mf-stock" value="${m.stock ?? 0}"></div>
+      <div class="form-group"><label>จุดสั่งซื้อขั้นต่ำ</label><input type="number" id="mf-reorder" value="${m.reorderPoint ?? 0}"></div>
+    </div>
+    <div class="form-group"><label>วันหมดอายุ (วว/ดด/ปปปป)</label><input type="text" id="mf-expiry" placeholder="01/05/2028" value="${esc(m.expiry||'')}"></div>
+    <div class="form-group"><label>รูปภาพ (URL)</label><input type="text" id="mf-image" placeholder="https://..." value="${esc(m.image||'')}"></div>
+    <div class="form-group"><label>ข้อบ่งใช้ / วิธีใช้ (แสดงเป็นป็อปอัปตอนเบิก)</label><textarea id="mf-indication" rows="2">${m.indication||''}</textarea></div>
+    <div class="form-group"><label>หมายเหตุ</label><input type="text" id="mf-note" value="${m.note||''}"></div>
+  `;
+}
+function openAddMedicine() {
+  openModal(`<div class="modal-header"><h3>เพิ่มรายการยา</h3><button class="modal-close" onclick="closeModal()">✕</button></div>${medicineFormFields()}<button class="btn btn-primary btn-block" onclick="saveNewMedicine()">บันทึก</button>`);
+}
+async function saveNewMedicine() {
+  const payload = readMedicineForm();
+  payload.password = state.adminPassword;
+  try {
+    const res = await api('addMedicine', payload);
+    if (res.ok) { showToast('เพิ่มรายการเรียบร้อย ✓', 'success'); closeModal(); renderManageMedicines(); }
+    else showToast(res.error, 'error');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+function openEditMedicine(rowIndex) {
+  const m = state.medicines.find(x => x.rowIndex === rowIndex);
+  openModal(`<div class="modal-header"><h3>แก้ไขรายการยา</h3><button class="modal-close" onclick="closeModal()">✕</button></div>${medicineFormFields(m)}<button class="btn btn-primary btn-block" onclick="saveEditMedicine(${rowIndex})">บันทึกการแก้ไข</button>`);
+}
+async function saveEditMedicine(rowIndex) {
+  const payload = readMedicineForm();
+  payload.rowIndex = rowIndex;
+  payload.password = state.adminPassword;
+  try {
+    const res = await api('updateMedicine', payload);
+    if (res.ok) { showToast('แก้ไขเรียบร้อย ✓', 'success'); closeModal(); renderManageMedicines(); }
+    else showToast(res.error, 'error');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+function readMedicineForm() {
+  return {
+    category: document.getElementById('mf-category').value,
+    name: document.getElementById('mf-name').value.trim(),
+    volume: document.getElementById('mf-volume').value.trim(),
+    unit: document.getElementById('mf-unit').value.trim(),
+    stock: document.getElementById('mf-stock').value,
+    reorderPoint: document.getElementById('mf-reorder').value,
+    expiry: document.getElementById('mf-expiry').value.trim(),
+    image: document.getElementById('mf-image').value.trim(),
+    indication: document.getElementById('mf-indication').value.trim(),
+    note: document.getElementById('mf-note').value.trim()
+  };
+}
+function confirmDeleteMedicine(rowIndex, name) {
+  openModal(`
+    <div class="modal-header"><h3>ลบรายการ?</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <p style="margin-bottom:18px;">ต้องการลบ "<b>${esc(name)}</b>" ออกจากรายการยาใช่หรือไม่? ประวัติการเบิก/นำเข้าเดิมจะยังอยู่</p>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-outline btn-block" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn btn-danger btn-block" onclick="deleteMedicine(${rowIndex})">ยืนยันลบ</button>
+    </div>`);
+}
+async function deleteMedicine(rowIndex) {
+  try {
+    const res = await api('deleteMedicine', { rowIndex, password: state.adminPassword });
+    if (res.ok) { showToast('ลบรายการเรียบร้อย', 'success'); closeModal(); renderManageMedicines(); }
+    else showToast(res.error, 'error');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+/* ---------- ADMIN: จัดการความรู้ ---------- */
+async function renderManageKnowledge() {
+  const sub = document.getElementById('admin-sub');
+  sub.innerHTML = `<div class="card"><div class="empty">กำลังโหลด...</div></div>`;
+  await loadKnowledge();
+  const rows = state.knowledge.map(a => `
+    <tr>
+      <td>${a.title ? '📖' : ''}</td>
+      <td>${esc(a.title)}</td><td>${esc(a.category)}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-outline btn-sm" onclick="openEditKnowledge(${a.rowIndex})">แก้ไข</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmDeleteKnowledge(${a.rowIndex}, '${esc(a.title).replace(/'/g,"\\'")}')">ลบ</button>
+      </td>
+    </tr>`).join('') || `<tr><td colspan="4" style="text-align:center;padding:16px;">ยังไม่มีบทความ</td></tr>`;
+  sub.innerHTML = `
+    <div class="card">
+      <div class="section-title"><h2>📚 จัดการคลังความรู้</h2><button class="btn btn-primary btn-sm" onclick="openAddKnowledge()">+ เพิ่มบทความ</button></div>
+      <div class="section-hint">เพิ่มข้อมูลปฐมพยาบาลเพื่อให้พนักงานศึกษาเบื้องต้น พร้อมใส่ลิงก์อ้างอิงและ Spotify ได้</div>
+      <div class="table-wrap"><table><thead><tr><th></th><th>หัวข้อ</th><th>หมวดหมู่</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+    </div>`;
+}
+
+function knowledgeFormFields(a = {}) {
+  return `
+    <div class="form-group"><label>หัวข้อ</label><input type="text" id="kf-title" value="${esc(a.title||'')}" placeholder="เช่น การช่วยชีวิตขั้นพื้นฐาน (CPR)"></div>
+    <div class="form-group"><label>หมวดหมู่</label><input type="text" id="kf-category" value="${esc(a.category||'')}" placeholder="เช่น ปฐมพยาบาล"></div>
+    <div class="form-group"><label>สรุปย่อ (แสดงในรายการ)</label><textarea id="kf-summary" rows="2">${esc(a.summary||'')}</textarea></div>
+    <div class="form-group"><label>เนื้อหาเต็ม</label><textarea id="kf-content" rows="6">${esc(a.content||'')}</textarea></div>
+    <div class="form-group"><label>เพลง Spotify (ชื่อเพลง | ลิงก์รูป | ลิงก์เพลง)</label><input type="text" id="kf-spotify" value="${esc(a.spotify||'')}" placeholder="คั่นด้วย , หากมีหลายเพลง หรือกด Enter ขึ้นบรรทัดใหม่"></div>
+    <div class="form-group"><label>รูปภาพ (URL, ไม่บังคับ)</label><input type="text" id="kf-image" value="${esc(a.image||'')}" placeholder="https://..."></div>
+    <div class="form-group"><label>ลิงก์วิดีโอ (URL, ไม่บังคับ)</label><input type="text" id="kf-video" value="${esc(a.video||'')}" placeholder="https://..."></div>
+    <div class="form-group"><label>ลิงก์อ้างอิง (URL, ไม่บังคับ)</label><input type="text" id="kf-ref" value="${esc(a.reference||'')}" placeholder="https://..."></div>
+  `;
+}
+function openAddKnowledge() {
+  openModal(`<div class="modal-header"><h3>เพิ่มบทความความรู้</h3><button class="modal-close" onclick="closeModal()">✕</button></div>${knowledgeFormFields()}<button class="btn btn-primary btn-block" onclick="saveNewKnowledge()">บันทึก</button>`);
+}
+async function saveNewKnowledge() {
+  const payload = readKnowledgeForm();
+  payload.password = state.adminPassword;
+  try {
+    const res = await api('addKnowledge', payload);
+    if (res.ok) { showToast('เพิ่มบทความเรียบร้อย ✓', 'success'); closeModal(); renderManageKnowledge(); }
+    else showToast(res.error, 'error');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+function openEditKnowledge(rowIndex) {
+  const a = state.knowledge.find(x => x.rowIndex === rowIndex);
+  openModal(`<div class="modal-header"><h3>แก้ไขบทความ</h3><button class="modal-close" onclick="closeModal()">✕</button></div>${knowledgeFormFields(a)}<button class="btn btn-primary btn-block" onclick="saveEditKnowledge(${rowIndex})">บันทึกการแก้ไข</button>`);
+}
+async function saveEditKnowledge(rowIndex) {
+  const payload = readKnowledgeForm();
+  payload.rowIndex = rowIndex;
+  payload.password = state.adminPassword;
+  try {
+    const res = await api('updateKnowledge', payload);
+    if (res.ok) { showToast('แก้ไขเรียบร้อย ✓', 'success'); closeModal(); renderManageKnowledge(); }
+    else showToast(res.error, 'error');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+function readKnowledgeForm() {
+  return {
+    title: document.getElementById('kf-title').value.trim(),
+    category: document.getElementById('kf-category').value.trim(),
+    summary: document.getElementById('kf-summary').value.trim(),
+    content: document.getElementById('kf-content').value.trim(),
+    spotify: document.getElementById('kf-spotify').value.trim(),
+    image: document.getElementById('kf-image').value.trim(),
+    video: document.getElementById('kf-video').value.trim(),
+    reference: document.getElementById('kf-ref').value.trim()
+  };
+}
+function confirmDeleteKnowledge(rowIndex, title) {
+  openModal(`
+    <div class="modal-header"><h3>ลบบทความ?</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <p style="margin-bottom:18px;">ต้องการลบ "<b>${esc(title)}</b>" ใช่หรือไม่?</p>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-outline btn-block" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn btn-danger btn-block" onclick="deleteKnowledgeItem(${rowIndex})">ยืนยันลบ</button>
+    </div>`);
+}
+async function deleteKnowledgeItem(rowIndex) {
+  try {
+    const res = await api('deleteKnowledge', { rowIndex, password: state.adminPassword });
+    if (res.ok) { showToast('ลบบทความเรียบร้อย', 'success'); closeModal(); renderManageKnowledge(); }
+    else showToast(res.error, 'error');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+async function renderAdminHistory(type = 'request') {
+  state.historyType = type;
+  const sub = document.getElementById('admin-sub');
+  sub.innerHTML = `<div class="card"><div class="empty">กำลังโหลด...</div></div>`;
+  try {
+    const res = await api('getHistory', { type });
+    if (!res.ok) return showToast(res.error, 'error');
+    const records = res.records.slice().reverse();
+    const isReq = type === 'request';
+    const headers = isReq ? ['วันที่เบิก','รหัสพนักงาน','ชื่อ-สกุล','ชื่อยา','จำนวน','หน่วย','ผู้ดูแล'] : ['วันที่เวลา','ชื่อยา','จำนวน','หน่วย','ผู้นำเข้า','Lot'];
+    const keys = isReq ? ['วันที่เบิก','รหัสพนักงาน','ชื่อ-สกุล','ชื่อยา','จำนวนที่เบิก','หน่วย','ผู้ดูแล'] : ['วันที่เวลา','ชื่อยา','จำนวนนำเข้า','หน่วย','ผู้นำเข้า','Lot / วันหมดอายุใหม่'];
+    const rows = records.map(r => `<tr>${keys.map(k => `<td>${esc((k==='วันที่เวลา'||k==='วันที่เบิก') ? formatDate(r[k]) : r[k])}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="7" style="text-align:center;padding:16px;">ไม่มีข้อมูล</td></tr>`;
+    sub.innerHTML = `
+      <div class="card">
+        <div class="section-title"><h2>🧾 ประวัติทั้งหมด</h2></div>
+        <div class="segment">
+          <button class="${isReq?'active':''}" onclick="renderAdminHistory('request')">ประวัติการเบิก</button>
+          <button class="${!isReq?'active':''}" onclick="renderAdminHistory('import')">ประวัติการนำเข้า</button>
+        </div>
+        <div class="table-wrap"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>
+      </div>`;
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+function renderAdminSettings() {
+  const sub = document.getElementById('admin-sub');
+  sub.innerHTML = `
+    <div class="card">
+      <div class="section-title"><h2>⚙️ เปลี่ยนรหัสผ่านแอดมิน</h2></div>
+      <div class="form-group"><label>รหัสผ่านใหม่</label><input type="password" id="new-admin-pass"></div>
+      <button class="btn btn-navy btn-block" onclick="changePass('admin')">บันทึก</button>
+    </div>
+    <div class="card">
+      <div class="section-title"><h2>⚙️ เปลี่ยนรหัสผ่านสำหรับนำเข้า</h2></div>
+      <div class="form-group"><label>รหัสผ่านใหม่</label><input type="password" id="new-import-pass"></div>
+      <button class="btn btn-navy btn-block" onclick="changePass('import')">บันทึก</button>
+    </div>
+    <div class="card">
+      <div class="section-title"><h2>👥 รายชื่อพนักงาน / ผู้ดูแล</h2></div>
+      <div class="section-hint">แก้ไขรายชื่อพนักงาน (สำหรับค้นหาด้วยรหัสพนักงาน) และรายชื่อผู้ดูแล (สำหรับดรอปดาวน์) ได้โดยตรงในแท็บ "พนักงาน" และ "ผู้ดูแล" บน Google ชีต</div>
+    </div>`;
+}
+async function changePass(type) {
+  const id = type === 'admin' ? 'new-admin-pass' : 'new-import-pass';
+  const newPassword = document.getElementById(id).value;
+  if (!newPassword || newPassword.length < 4) return showToast('รหัสผ่านต้องมีอย่างน้อย 4 ตัวอักษร', 'error');
+  try {
+    const res = await api('changePassword', { type, newPassword, password: state.adminPassword });
+    if (res.ok) {
+      showToast('เปลี่ยนรหัสผ่านเรียบร้อย ✓', 'success');
+      if (type === 'admin') state.adminPassword = newPassword;
+      document.getElementById(id).value = '';
+    } else showToast(res.error, 'error');
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+/* ============================================================
+   ROUTER
+   ============================================================ */
+function render() {
+  renderSetupBanner();
+  if (state.view === 'request') renderRequestView();
+  else if (state.view === 'knowledge') renderKnowledgeView();
+  else if (state.view === 'import') renderImportView();
+  else if (state.view === 'reports') renderReportsView();
+  else if (state.view === 'admin') renderAdminView();
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function setSplashProgress(pct, label) {
+  const fill = document.getElementById('load-bar-fill');
+  const txt = document.getElementById('load-text');
+  const pctEl = document.getElementById('load-pct');
+  if (fill) fill.style.width = pct + '%';
+  if (txt && label) txt.textContent = label;
+  if (pctEl) pctEl.textContent = pct + '%';
+  if (pct >= 100) {
+    const btn = document.getElementById('splash-enter-btn');
+    if (btn) btn.disabled = false;
+    if (txt) txt.textContent = 'พร้อมใช้งานแล้ว!';
+  }
+}
+
+async function init() {
+  document.querySelector('.nav-btn[data-view="request"]').classList.add('active');
+  document.getElementById('bottom-nav').style.display = 'none';
+  document.body.style.overflow = 'hidden';
+  render();
+
+  if (!CONFIG.APPS_SCRIPT_URL) {
+    setSplashProgress(100);
+    return;
+  }
+
+  setSplashProgress(10, 'กำลังเชื่อมต่อระบบ...');
+  await loadMedicines();
+  setSplashProgress(50, 'กำลังโหลดรายการยา...');
+  await loadStaffData();
+  setSplashProgress(78, 'กำลังโหลดข้อมูลพนักงาน...');
+  await loadKnowledge();
+  setSplashProgress(96, 'กำลังโหลดคลังความรู้...');
+  render();
+  setSplashProgress(100);
+}
+
+init();
+</script>
+</body>
+</html>
