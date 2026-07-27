@@ -841,12 +841,15 @@ function renderMedicineBrowseList() {
            else badgeHtml = `<span class="pill pill-ok">เหลือ ${days} วัน (${dateStr})</span>`;
         }
 
+        const noteHtml = item.note ? `<div style="font-size:11px; color:var(--amber); margin-top:4px;">📌 ${esc(item.note)}</div>` : '';
+
         html += `
           <div class="med-item ${categoryClass(item.category)}" onclick="addToCart(${item.rowIndex})">
             ${thumbHtml(item)}
             <div class="med-info">
               <div class="med-name">${esc(item.name)}</div>
               <div class="med-sub">${esc(item.volume)}${item.volume ? ' ' : ''}${item.unit ? '· หน่วย ' + esc(item.unit) : ''} ${badgeHtml}</div>
+              ${noteHtml}
             </div>
             <div class="med-stock">
               <div><span class="qty">${item.stock}</span> <span style="font-size:11px;color:var(--muted)">${esc(item.unit)}</span></div>
@@ -886,7 +889,7 @@ function addToCart(rowIndex) {
     if (existing.qty < item.stock) existing.qty += 1;
     else return showToast('จำนวนคงเหลือไม่พอเพิ่มอีก', 'error');
   } else {
-    state.cart.push({ rowIndex, name: item.name, unit: item.unit, image: item.image, category: item.category, stock: item.stock, qty: 1, indication: item.indication });
+    state.cart.push({ rowIndex, name: item.name, unit: item.unit, image: item.image, category: item.category, stock: item.stock, qty: 1, indication: item.indication, note: item.note });
   }
   renderCartList();
   showToast('เพิ่ม "' + item.name + '" ลงตะกร้าแล้ว', 'success');
@@ -931,7 +934,7 @@ function reviewRequest() {
   const employeeName = document.getElementById('rf-empname').value.trim();
   const symptom = document.getElementById('rf-symptom').value.trim();
   const caretaker = document.getElementById('rf-caretaker').value;
-  const note = document.getElementById('rf-note').value.trim();
+  const userNote = document.getElementById('rf-note').value.trim();
 
   if (!date) return showToast('กรุณาเลือกวันที่เบิก', 'error');
   if (!employeeId) return showToast('กรุณากรอกรหัสพนักงาน', 'error');
@@ -939,9 +942,11 @@ function reviewRequest() {
   if (!caretaker) return showToast('กรุณาเลือกผู้ดูแล', 'error');
   if (state.cart.length === 0) return showToast('กรุณาเลือกรายการยาอย่างน้อย 1 รายการ', 'error');
 
-  state.pendingRequest = { date, employeeId, employeeName, symptom, caretaker, note };
+  state.pendingRequest = { date, employeeId, employeeName, symptom, caretaker, note: userNote };
 
-  const itemsHtml = state.cart.map(c => `
+  const itemsHtml = state.cart.map(c => {
+    const medNoteHtml = c.note ? `<div style="margin-top:6px; color:var(--amber); font-weight:600;">📌 หมายเหตุ: ${esc(c.note)}</div>` : '';
+    return `
     <div style="border-bottom:1px solid var(--border); padding:10px 0;">
       <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
         <div style="display:flex; align-items:center; gap:8px; min-width:0;">
@@ -950,8 +955,12 @@ function reviewRequest() {
         </div>
         <span style="font-family:'JetBrains Mono',monospace; font-size:13px; flex-shrink:0;">${c.qty} ${esc(c.unit)}</span>
       </div>
-      <div style="font-size:12.5px; color:var(--text); margin-top:6px; background:var(--sky-light); padding:8px 10px; border-radius:9px; line-height:1.6; white-space:pre-line;"><b>💊 ข้อบ่งใช้/วิธีใช้:</b>\n${c.indication || 'ไม่มีข้อมูลระบุเพิ่มเติม โปรดสอบถามผู้ดูแลก่อนใช้'}</div>
-    </div>`).join('');
+      <div style="font-size:12.5px; color:var(--text); margin-top:6px; background:var(--sky-light); padding:8px 10px; border-radius:9px; line-height:1.6; white-space:pre-line;">
+        <b>💊 ข้อบ่งใช้/วิธีใช้:</b>\n${c.indication || 'ไม่มีข้อมูลระบุเพิ่มเติม โปรดสอบถามผู้ดูแลก่อนใช้'}
+        ${medNoteHtml}
+      </div>
+    </div>`;
+  }).join('');
 
   openModal(`
     <div class="modal-header"><h3 style="font-size:16px;">⚠️ ตรวจสอบข้อบ่งใช้ก่อนยืนยัน</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
@@ -1363,7 +1372,6 @@ function buildHistoryPrintArea(type, records, from, to) {
     : ['วันที่เวลา','ชื่อยา','จำนวนนำเข้า','หน่วย','ผู้นำเข้า','Lot / วันหมดอายุใหม่'];
 
   let rows = records.map(r => `<tr>${keys.map((k, index) => {
-    // ป้องกันคอลัมน์สั้นๆ หดตกขอบ เช่น วันที่, รหัส, จำนวน, หน่วย
     const noWrap = (index === 0 || index === 1 || index === 4 || index === 5) ? 'white-space:nowrap;' : '';
     return `<td style="padding:6px 4px; border-bottom:1px dotted #ccc; font-size:14pt; text-align:left; vertical-align:top; ${noWrap}">${esc((k === 'วันที่เวลา' || k === 'วันที่เบิก') ? formatDate(r[k]) : r[k])}</td>`;
   }).join('')}</tr>`).join('');
